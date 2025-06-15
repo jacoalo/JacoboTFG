@@ -1,0 +1,101 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-outline-secondary me-3" (click)="volverALista()">
+        <i class="fa fa-arrow-left"></i>
+      </button>
+      <h2 class="mb-0">Comisiones de Servicio</h2>
+    </div>
+    <div class="d-flex gap-2">
+      <!-- Botón para ir al menú principal -->
+      <button class="btn btn-secondary" [routerLink]="['/dashboard']">
+        <i class="fa fa-home me-1"></i> Menú Principal
+      </button>
+      <div *ngIf="!loading && !error && isGestor">
+        <button type="button" class="btn btn-primary" [routerLink]="['/comisiones-servicio/proyecto', proyectoId, 'nueva']">
+          <i class="fa fa-plus-circle me-1"></i> Nueva Comisión
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+    <button type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="cargarComisiones()">
+      <i class="fa fa-refresh"></i> Reintentar
+    </button>
+  </div>
+
+  <!-- Spinner de carga -->
+  <div *ngIf="loading" class="text-center p-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2">Cargando comisiones...</p>
+  </div>
+
+  <!-- Mensaje cuando no hay comisiones -->
+  <div *ngIf="!loading && !error && comisiones.length === 0" class="text-center p-5">
+    <i class="fa fa-info-circle text-muted mb-2" style="font-size: 2rem;"></i>
+    <p class="text-muted">No hay comisiones de servicio registradas para este proyecto</p>
+    <button *ngIf="isGestor" type="button" class="btn btn-primary mt-3" [routerLink]="['/comisiones-servicio/proyecto', proyectoId, 'nueva']">
+      <i class="fa fa-plus-circle me-1"></i> Crear Nueva Comisión
+    </button>
+  </div>
+
+  <!-- Lista de comisiones -->
+  <div *ngIf="!loading && !error && comisiones.length > 0" class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">Comisionado</th>
+              <th scope="col">Destino</th>
+              <th scope="col">Motivo del viaje</th>
+              <th scope="col">Fecha inicio</th>
+              <th scope="col">Fecha fin</th>
+              <th scope="col">Duración</th>
+              <th scope="col">Gastos</th>
+              <th scope="col">Estado</th>
+              <th scope="col">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let comision of comisiones">
+              <td>{{ comision.nombre }} {{ comision.apellido1 }} {{ comision.apellido2 || '' }}</td>
+              <td>{{ comision.destino }}</td>
+              <td>{{ comision.motivo_viaje }}</td>
+              <td>{{ comision.fecha_inicio | date:'dd/MM/yyyy' }}</td>
+              <td>{{ comision.fecha_fin | date:'dd/MM/yyyy' }}</td>
+              <td>{{ calcularDuracion(comision.fecha_inicio, comision.fecha_fin) }} días</td>
+              <td>{{ comision.gastos_generados }} €</td>
+              <td>
+                <span class="badge rounded-pill" [ngClass]="getEstadoBadge(comision)">
+                  {{ getEstadoTexto(comision) }}
+                </span>
+              </td>
+              <td>
+                <div class="btn-group btn-group-sm">
+                  <button type="button" class="btn btn-outline-info" 
+                    title="Ver detalles" (click)="verDetalle(comision.id_comision)">
+                    <i class="fa fa-eye"></i>
+                  </button>
+                  <button *ngIf="isGestor" type="button" class="btn btn-outline-primary" 
+                    title="Editar comisión" (click)="editarComision(comision.id_comision)">
+                    <i class="fa fa-edit"></i>
+                  </button>
+                  <button *ngIf="isGestor" type="button" class="btn btn-outline-danger" 
+                    title="Eliminar comisión" (click)="eliminarComision(comision.id_comision)">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,150 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-outline-secondary me-3" (click)="volverALista()">
+        <i class="fa fa-arrow-left"></i>
+      </button>
+      <h2 class="mb-0">Detalle del Contrato Menor</h2>
+    </div>
+    <div class="btn-group" *ngIf="!loading && contrato">
+      <button type="button" *ngIf="isGestor" class="btn btn-primary" [routerLink]="['/contratos-menores', contratoId, 'editar']">
+        <i class="fa fa-edit me-1"></i> Editar
+      </button>
+      <button type="button" *ngIf="isGestor" class="btn btn-success" [routerLink]="['/contratos-menores', contratoId, 'facturas']">
+        <i class="fa fa-file-text me-1"></i> Facturas
+      </button>
+      <button type="button" *ngIf="isGestor" class="btn btn-info" [routerLink]="['/contratos-menores', contratoId, 'articulos']">
+        <i class="fa fa-list me-1"></i> Artículos
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="generarPDF()">
+        <i class="fa fa-file-pdf-o me-1"></i> Generar PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Spinner de carga -->
+  <div *ngIf="loading" class="text-center p-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2">Cargando datos del contrato menor...</p>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="!loading && error" class="alert alert-danger">
+    {{ error }}
+    <button type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="cargarContrato()">
+      <i class="fa fa-refresh"></i> Reintentar
+    </button>
+  </div>
+
+  <!-- Indicador de generación de PDF -->
+  <div *ngIf="generandoPDF" class="alert alert-info mb-3">
+    <div class="d-flex align-items-center">
+      <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+        <span class="visually-hidden">Generando PDF...</span>
+      </div>
+      <span>Generando documento PDF...</span>
+    </div>
+  </div>
+
+  <!-- Datos del contrato -->
+  <div *ngIf="!loading && !error && contrato" class="row">
+    <div class="col-md-12 mb-4">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Información General</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <p><strong>ID Contrato:</strong> {{ contrato.id }}</p>
+              <p><strong>ID Proyecto:</strong> {{ contrato.proyecto }}</p>
+              <p><strong>Proveedor:</strong> {{ contrato.proveedor }}</p>
+              <p><strong>CIF:</strong> {{ contrato.cif }}</p>
+              <p><strong>Importe:</strong> {{ contrato.importe }} €</p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Localidad:</strong> {{ contrato.localidad }}</p>
+              <p><strong>Ejercicio:</strong> {{ contrato.ejercicio }}</p>
+              <p><strong>Fecha Firma IP:</strong> {{ contrato.fecha_firma_ip | date:'dd/MM/yyyy' }}</p>
+              <p><strong>Fecha Firma Gerente:</strong> {{ contrato.fecha_firma_gerente | date:'dd/MM/yyyy' }}</p>
+              <p><strong>Estado:</strong> <span class="badge" [ngClass]="{'bg-success': getEstadoDocumento() === 'Firmado', 'bg-info': getEstadoDocumento() === 'Generado', 'bg-warning': getEstadoDocumento() === 'Pendiente'}">{{ getEstadoDocumento() }}</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Justificación y necesidad -->
+    <div class="col-md-12 mb-4">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Justificación y Necesidad</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <h6>Justificación:</h6>
+            <p>{{ contrato.justificacion }}</p>
+          </div>
+          <div *ngIf="necesidad">
+            <h6>Necesidad (ID: {{ necesidad.id }}):</h6>
+            <p>{{ necesidad.texto }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Criterios -->
+    <div class="col-md-12 mb-4">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Criterios de Adjudicación</h5>
+        </div>
+        <div class="card-body">
+          <p><strong>Criterio Económico:</strong> <i class="fa" [ngClass]="contrato.ofertaeconomica ? 'fa-check text-success' : 'fa-times text-danger'"></i> {{ contrato.ofertaeconomica ? 'Sí' : 'No' }}</p>
+          <p><strong>Criterio de Calidad:</strong> <i class="fa" [ngClass]="contrato.calidad ? 'fa-check text-success' : 'fa-times text-danger'"></i> {{ contrato.calidad ? 'Sí' : 'No' }}</p>
+          <div *ngIf="contrato.calidad && contrato.criterio_calidad">
+            <p><strong>Detalle del Criterio de Calidad:</strong> {{ contrato.criterio_calidad }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documentos -->
+    <div class="col-md-12 mb-4">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Documentos</h5>
+        </div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <strong>Presupuesto:</strong>
+              <div *ngIf="contrato.presupuesto" class="mt-2">
+                <a href="javascript:void(0)" (click)="abrirDocumento(contrato.presupuesto)" class="btn btn-sm btn-outline-primary">
+                  <i class="fa fa-download me-1"></i> Descargar
+                </a>
+              </div>
+              <div *ngIf="!contrato.presupuesto" class="text-muted mt-2">
+                No hay documento disponible
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <strong>Documento Firmado:</strong>
+              <div *ngIf="contrato.documento_firmado" class="mt-2">
+                <a href="javascript:void(0)" (click)="abrirDocumento(contrato.documento_firmado)" class="btn btn-sm btn-outline-primary">
+                  <i class="fa fa-download me-1"></i> Descargar
+                </a>
+              </div>
+              <div *ngIf="!contrato.documento_firmado" class="text-muted mt-2">
+                No hay documento disponible
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

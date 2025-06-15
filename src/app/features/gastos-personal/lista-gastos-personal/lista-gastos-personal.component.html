@@ -1,0 +1,137 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-outline-secondary me-3" (click)="volverALista()">
+        <i class="fa fa-arrow-left"></i>
+      </button>
+      <h2 class="mb-0">Gastos de Personal</h2>
+    </div>
+    <div *ngIf="!loading && isGestor" class="d-flex gap-2">
+      <a [routerLink]="['/gastos-personal/proyecto', proyectoId, 'nuevo']" class="btn btn-primary">
+        <i class="fa fa-plus-circle me-2"></i> Nuevo Gasto
+      </a>
+    </div>
+  </div>
+
+  <!-- Información del proyecto -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">Información del Proyecto</h5>
+    </div>
+    <div class="card-body">
+      <div *ngIf="loadingProyecto" class="text-center p-3">
+        <div class="spinner-border spinner-border-sm text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <span class="ms-2">Cargando información del proyecto...</span>
+      </div>
+      <div *ngIf="!loadingProyecto && proyecto" class="row">
+        <div class="col-md-4">
+          <strong>ID Proyecto:</strong>
+          <p>{{ proyecto.IDProyecto }}</p>
+        </div>
+        <div class="col-md-4">
+          <strong>Finalidad:</strong>
+          <p>{{ proyecto.finalidad }}</p>
+        </div>
+        <div class="col-md-4">
+          <strong>Importe Total:</strong>
+          <p>{{ proyecto.cantidad_total | currency:'EUR' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de gastos -->
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">Lista de Gastos de Personal</h5>
+    </div>
+    <div class="card-body">
+      <div *ngIf="loading" class="text-center p-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-2">Cargando gastos de personal...</p>
+      </div>
+
+      <div *ngIf="error" class="alert alert-danger">
+        {{ error }}
+        <button type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="cargarGastosPersonal()">
+          <i class="fa fa-refresh"></i> Reintentar
+        </button>
+      </div>
+
+      <div *ngIf="!loading && !error">
+        <div *ngIf="gastos.length === 0" class="text-center p-5">
+          <i class="fa fa-users fa-4x text-muted mb-3"></i>
+          <h6 class="text-muted">No hay gastos de personal registrados para este proyecto</h6>
+        </div>
+
+        <div *ngIf="gastos.length > 0" class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Personal</th>
+                <th>Tipo de Gasto</th>
+                <th>Importe</th>
+                <th>Período</th>
+                <th>Documento</th>
+                <th *ngIf="isGestor">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let gasto of gastos">
+                <td>
+                  <div class="d-flex flex-column">
+                    <span class="fw-bold">{{ getNombreCompleto(gasto.dni) }}</span>
+                    <small class="text-muted">DNI: {{ gasto.dni }}</small>
+                  </div>
+                </td>
+                <td>{{ gasto.tipo_gasto }}</td>
+                <td>{{ gasto.importe | currency:'EUR' }}</td>
+                <td>
+                  <div class="d-flex flex-column">
+                    <span>{{ getMesNombre(gasto.mes) }}</span>
+                    <small class="text-muted">{{ gasto.anio }}</small>
+                  </div>
+                </td>
+                <td>
+                  <a *ngIf="gasto.documento" 
+                     [href]="getDocumentoUrl(gasto.documento)" 
+                     target="_blank" 
+                     class="btn btn-sm btn-outline-primary">
+                    <i class="fa fa-file-pdf-o"></i> Ver documento
+                  </a>
+                  <span *ngIf="!gasto.documento" class="text-muted">
+                    <i class="fa fa-times"></i> Sin documento
+                  </span>
+                </td>
+                <td *ngIf="isGestor">
+                  <div class="btn-group btn-group-sm">
+                    <a [routerLink]="['/gastos-personal', gasto.dni, gasto.proyecto, gasto.mes, gasto.anio]" 
+                       class="btn btn-outline-primary" 
+                       title="Ver detalles">
+                      <i class="fa fa-eye"></i>
+                    </a>
+                    <a [routerLink]="['/gastos-personal', gasto.dni, gasto.proyecto, gasto.mes, gasto.anio, 'editar']" 
+                       class="btn btn-outline-secondary" 
+                       title="Editar">
+                      <i class="fa fa-edit"></i>
+                    </a>
+                    <button type="button" 
+                            class="btn btn-outline-danger" 
+                            title="Eliminar"
+                            (click)="eliminarGasto(gasto)">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

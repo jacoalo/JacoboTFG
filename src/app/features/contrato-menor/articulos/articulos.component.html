@@ -1,0 +1,322 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-outline-secondary me-3" (click)="volverALista()">
+        <i class="fa fa-arrow-left"></i>
+      </button>
+      <h2 class="mb-0">Artículos del Contrato Menor</h2>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-secondary" [routerLink]="['/dashboard']">
+        <i class="fa fa-home me-1"></i> Menú Principal
+      </button>
+      <button *ngIf="isGestor && !showFormNuevo && !showFormEditar" class="btn btn-primary" (click)="iniciarNuevoArticulo()">
+        <i class="fa fa-plus-circle me-1"></i> Nuevo Artículo
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="contrato" class="mb-3">
+    <small class="text-muted">
+      Contrato Menor ID: {{ contrato.id }} | Proveedor: {{ contrato.proveedor }} | CIF: {{ contrato.cif }}
+    </small>
+  </div>
+
+  <!-- Mensajes de éxito -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
+
+  <!-- Spinner de carga -->
+  <div *ngIf="loading || loadingContrato" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2">Cargando datos...</p>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="!loading && !loadingContrato && error" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''"></button>
+  </div>
+
+  <!-- Formulario de Nuevo Artículo -->
+  <div *ngIf="showFormNuevo && !loading && !loadingContrato" class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">Nuevo Artículo</h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="articuloForm" (ngSubmit)="guardarArticulo()">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="id_art" class="form-label">ID Artículo <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="id_art" formControlName="id_art">
+            <small class="text-muted">Introduzca un ID para este artículo (ejemplo: "ART-001")</small>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="descripcion" class="form-label">Descripción <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="descripcion" formControlName="descripcion" required>
+            <div *ngIf="articuloForm.get('descripcion')?.invalid && articuloForm.get('descripcion')?.touched" class="text-danger">
+              La descripción es obligatoria
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="cantidad" class="form-label">Cantidad <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" id="cantidad" formControlName="cantidad" min="1" required>
+            <div *ngIf="articuloForm.get('cantidad')?.invalid && articuloForm.get('cantidad')?.touched" class="text-danger">
+              La cantidad debe ser al menos 1
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="precio" class="form-label">Precio unitario (€) <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" id="precio" formControlName="precio" min="0" step="0.01" required>
+            <div *ngIf="articuloForm.get('precio')?.invalid && articuloForm.get('precio')?.touched" class="text-danger">
+              El precio no puede ser negativo
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="id_factura" class="form-label">ID Factura</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="id_factura" formControlName="id_factura">
+              <button *ngIf="articuloForm.get('id_factura')?.value" class="btn btn-outline-danger" type="button" 
+                      (click)="desasignarFactura()">
+                <i class="fa fa-times"></i>
+              </button>
+            </div>
+            <small class="text-muted">Opcional: ID de la factura asociada</small>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="id_cm" class="form-label">ID Contrato Menor <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="id_cm" formControlName="id_cm" readonly>
+            <small class="text-muted">Asociado automáticamente a este contrato</small>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end mt-3">
+          <button type="button" class="btn btn-secondary me-2" (click)="cancelarEdicion()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="articuloForm.invalid || submitting">
+            <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
+            Guardar Artículo
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Formulario de Editar Artículo -->
+  <div *ngIf="showFormEditar && !loading && !loadingContrato" class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">Editar Artículo</h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="articuloForm" (ngSubmit)="guardarArticulo()">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="id_art" class="form-label">ID Artículo</label>
+            <input type="text" class="form-control" id="id_art" formControlName="id_art" readonly>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="descripcion" class="form-label">Descripción <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="descripcion" formControlName="descripcion" required>
+            <div *ngIf="articuloForm.get('descripcion')?.invalid && articuloForm.get('descripcion')?.touched" class="text-danger">
+              La descripción es obligatoria
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="cantidad" class="form-label">Cantidad <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" id="cantidad" formControlName="cantidad" min="1" required>
+            <div *ngIf="articuloForm.get('cantidad')?.invalid && articuloForm.get('cantidad')?.touched" class="text-danger">
+              La cantidad debe ser al menos 1
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="precio" class="form-label">Precio unitario (€) <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" id="precio" formControlName="precio" min="0" step="0.01" required>
+            <div *ngIf="articuloForm.get('precio')?.invalid && articuloForm.get('precio')?.touched" class="text-danger">
+              El precio no puede ser negativo
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="id_factura" class="form-label">ID Factura</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="id_factura" formControlName="id_factura">
+              <button *ngIf="articuloForm.get('id_factura')?.value" class="btn btn-outline-danger" type="button" 
+                      (click)="desasignarFactura()">
+                <i class="fa fa-times"></i>
+              </button>
+            </div>
+            <small class="text-muted">Opcional: ID de la factura asociada</small>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="id_cm" class="form-label">ID Contrato Menor</label>
+            <input type="text" class="form-control" id="id_cm" formControlName="id_cm" readonly>
+            <small class="text-muted">Asociado automáticamente a este contrato</small>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end mt-3">
+          <button type="button" class="btn btn-secondary me-2" (click)="cancelarEdicion()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="articuloForm.invalid || submitting">
+            <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
+            Actualizar Artículo
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sin artículos -->
+  <div *ngIf="!loading && !loadingContrato && !error && articulos.length === 0 && !showFormNuevo && !showFormEditar" class="alert alert-info" role="alert">
+    No se encontraron artículos asociados a este contrato menor.
+    <button *ngIf="isGestor" type="button" class="btn btn-primary btn-sm ms-3" (click)="iniciarNuevoArticulo()">
+      Añadir artículo
+    </button>
+  </div>
+
+  <!-- Tabla de artículos -->
+  <div *ngIf="!loading && !loadingContrato && !error && articulos.length > 0 && !showFormNuevo && !showFormEditar" class="card">
+    <div class="card-body">
+      <!-- Resumen de totales -->
+      <div class="alert alert-info mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <strong>Total artículos:</strong> {{ articulos.length }}
+          </div>
+          <div>
+            <strong>Importe total:</strong> {{ calcularTotal() | number:'1.2-2' }} €
+          </div>
+        </div>
+      </div>
+      
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">ID Artículo</th>
+              <th scope="col">Descripción</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Precio</th>
+              <th scope="col">Total</th>
+              <th scope="col">ID Factura</th>
+              <th scope="col">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let articulo of articulos">
+              <td>{{ articulo.id_art }}</td>
+              <td>{{ articulo.descripcion }}</td>
+              <td>{{ articulo.cantidad }}</td>
+              <td>{{ articulo.precio | number:'1.2-2' }} €</td>
+              <td>{{ articulo.cantidad * articulo.precio | number:'1.2-2' }} €</td>
+              <td>
+                <span *ngIf="articulo.id_factura">
+                  <a [routerLink]="['/contratos-menores', articulo.id_cm, 'facturas']" 
+                     [queryParams]="{factura: articulo.id_factura}"
+                     class="text-primary">
+                    <i class="fa fa-file-text-o me-1"></i> {{ articulo.id_factura }}
+                  </a>
+                </span>
+                <span *ngIf="!articulo.id_factura" class="badge bg-secondary">No asociado</span>
+              </td>
+              <td>
+                <div class="btn-group btn-group-sm">
+                  <button type="button" class="btn btn-outline-info" 
+                    title="Ver detalles" (click)="verDetalle(articulo.id_art)">
+                    <i class="fa fa-eye"></i>
+                  </button>
+                  <button *ngIf="isGestor" type="button" class="btn btn-outline-primary" 
+                    title="Editar artículo" (click)="iniciarEditarArticulo(articulo.id_art)">
+                    <i class="fa fa-edit"></i>
+                  </button>
+                  <button *ngIf="isGestor" type="button" class="btn btn-outline-danger" 
+                    title="Eliminar artículo" (click)="eliminarArticulo(articulo.id_art)">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de visualización de artículo -->
+  <div class="modal fade" id="detalleArticuloModal" tabindex="-1" aria-labelledby="detalleArticuloModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title" id="detalleArticuloModalLabel">Detalles del Artículo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" (click)="cerrarModal()"></button>
+        </div>
+        <div class="modal-body" *ngIf="articuloViendo">
+          <div class="row mb-3">
+            <div class="col-5 fw-bold">ID:</div>
+            <div class="col-7">{{ articuloViendo.id_art }}</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-5 fw-bold">Descripción:</div>
+            <div class="col-7">{{ articuloViendo.descripcion }}</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-5 fw-bold">Cantidad:</div>
+            <div class="col-7">{{ articuloViendo.cantidad }}</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-5 fw-bold">Precio unitario:</div>
+            <div class="col-7">{{ articuloViendo.precio | number:'1.2-2' }} €</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-5 fw-bold">Importe total:</div>
+            <div class="col-7">{{ articuloViendo.cantidad * articuloViendo.precio | number:'1.2-2' }} €</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-5 fw-bold">Factura asociada:</div>
+            <div class="col-7">
+              <span *ngIf="articuloViendo.id_factura">
+                <a [routerLink]="['/contratos-menores', articuloViendo.id_cm, 'facturas']" 
+                   [queryParams]="{factura: articuloViendo.id_factura}"
+                   (click)="cerrarModal()" 
+                   class="text-primary">
+                  <i class="fa fa-file-text-o me-1"></i> {{ articuloViendo.id_factura }}
+                </a>
+                <small class="text-muted d-block mt-1">
+                  (Haz clic para ir a la sección de facturas)
+                </small>
+              </span>
+              <span *ngIf="!articuloViendo.id_factura" class="badge bg-secondary">No asociado</span>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-5 fw-bold">Contrato Menor:</div>
+            <div class="col-7">
+              <a [routerLink]="['/contratos-menores', articuloViendo.id_cm]" (click)="cerrarModal()">
+                {{ articuloViendo.id_cm }}
+              </a>
+            </div>
+          </div>
+          
+          <div *ngIf="contrato" class="alert alert-light mt-3">
+            <small>
+              <strong>Datos del contrato:</strong><br>
+              Proveedor: {{ contrato.proveedor }}<br>
+              CIF: {{ contrato.cif }}<br>
+              Fecha: {{ contrato.fecha_firma_ip | date:'dd/MM/yyyy' }}
+            </small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="cerrarModal()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,247 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-outline-secondary me-3" (click)="volverALista()">
+        <i class="fa fa-arrow-left"></i>
+      </button>
+      <h2 class="mb-0">Editar Contrato Menor</h2>
+    </div>
+    <div>
+      <small class="text-muted">ID: {{ contratoId }} | Proyecto: {{ proyecto }}</small>
+    </div>
+  </div>
+
+  <!-- Mensajes de éxito -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
+
+  <!-- Spinner de carga -->
+  <div *ngIf="loading" class="text-center p-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2">Cargando datos del contrato...</p>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="!loading && error" class="alert alert-danger">
+    {{ error }}
+    <button type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="error = ''">
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+
+  <!-- Formulario de edición -->
+  <form *ngIf="!loading && !error" [formGroup]="contratoForm" (ngSubmit)="onSubmit()">
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Información General</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <!-- ID Contrato -->
+          <div class="col-md-4 mb-3">
+            <label for="id" class="form-label">ID Contrato <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="id" formControlName="id" readonly>
+          </div>
+          
+          <!-- ID Proyecto -->
+          <div class="col-md-4 mb-3">
+            <label for="proyecto" class="form-label">ID Proyecto <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="proyecto" formControlName="proyecto" readonly>
+          </div>
+          
+          <!-- Ejercicio -->
+          <div class="col-md-4 mb-3">
+            <label for="ejercicio" class="form-label">Ejercicio <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" id="ejercicio" formControlName="ejercicio" min="2000">
+            <div *ngIf="contratoForm.get('ejercicio')?.invalid && contratoForm.get('ejercicio')?.touched" class="text-danger">
+              El ejercicio es obligatorio
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <!-- Proveedor -->
+          <div class="col-md-6 mb-3">
+            <label for="proveedor" class="form-label">Proveedor <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="proveedor" formControlName="proveedor">
+            <div *ngIf="contratoForm.get('proveedor')?.invalid && contratoForm.get('proveedor')?.touched" class="text-danger">
+              El proveedor es obligatorio
+            </div>
+          </div>
+          
+          <!-- CIF -->
+          <div class="col-md-6 mb-3">
+            <label for="cif" class="form-label">CIF <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="cif" formControlName="cif">
+            <div *ngIf="contratoForm.get('cif')?.invalid && contratoForm.get('cif')?.touched" class="text-danger">
+              El CIF es obligatorio
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <!-- Importe -->
+          <div class="col-md-6 mb-3">
+            <label for="importe" class="form-label">Importe (€) <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" id="importe" formControlName="importe" min="0" step="0.01">
+            <div *ngIf="contratoForm.get('importe')?.invalid && contratoForm.get('importe')?.touched" class="text-danger">
+              El importe es obligatorio y debe ser mayor o igual a 0
+            </div>
+          </div>
+          
+          <!-- Localidad -->
+          <div class="col-md-6 mb-3">
+            <label for="localidad" class="form-label">Localidad <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="localidad" formControlName="localidad">
+            <div *ngIf="contratoForm.get('localidad')?.invalid && contratoForm.get('localidad')?.touched" class="text-danger">
+              La localidad es obligatoria
+            </div>
+          </div>
+        </div>
+        
+        <!-- Justificación -->
+        <div class="mb-3">
+          <label for="justificacion" class="form-label">Justificación <span class="text-danger">*</span></label>
+          <textarea class="form-control" id="justificacion" formControlName="justificacion" rows="3"></textarea>
+          <div *ngIf="contratoForm.get('justificacion')?.invalid && contratoForm.get('justificacion')?.touched" class="text-danger">
+            La justificación es obligatoria
+          </div>
+        </div>
+        
+        <!-- Necesidad -->
+        <div class="mb-3">
+          <label for="necesidad" class="form-label">Necesidad <span class="text-danger">*</span></label>
+          <select class="form-select" id="necesidad" formControlName="necesidad">
+            <option *ngFor="let necesidad of necesidades" [value]="necesidad.id">
+              {{ necesidad.id }} - {{ necesidad.texto }}
+            </option>
+          </select>
+          <div *ngIf="contratoForm.get('necesidad')?.invalid && contratoForm.get('necesidad')?.touched" class="text-danger">
+            La necesidad es obligatoria
+          </div>
+        </div>
+        
+        <!-- Aplicación Presupuestaria -->
+        <div class="mb-3">
+          <label for="aplicacionp" class="form-label">Aplicación Presupuestaria</label>
+          <input type="text" class="form-control" id="aplicacionp" formControlName="aplicacionp">
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Criterios de Adjudicación</h5>
+      </div>
+      <div class="card-body">
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="ofertaeconomica" formControlName="ofertaeconomica">
+          <label class="form-check-label" for="ofertaeconomica">
+            Criterio Económico (Oferta más ventajosa)
+          </label>
+        </div>
+        
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="calidad" formControlName="calidad">
+          <label class="form-check-label" for="calidad">
+            Criterio de Calidad
+          </label>
+        </div>
+        
+        <div *ngIf="mostrarCampoCalidad" class="mb-3">
+          <label for="criterio_calidad" class="form-label">Detalle del Criterio de Calidad <span class="text-danger">*</span></label>
+          <textarea class="form-control" id="criterio_calidad" formControlName="criterio_calidad" rows="2"></textarea>
+          <div *ngIf="contratoForm.get('criterio_calidad')?.invalid && contratoForm.get('criterio_calidad')?.touched" class="text-danger">
+            El detalle del criterio de calidad es obligatorio cuando se selecciona criterio de calidad
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Firmas y Documentos</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <!-- Fecha Firma IP -->
+          <div class="col-md-6 mb-3">
+            <label for="fecha_firma_ip" class="form-label">Fecha Firma IP</label>
+            <input type="date" class="form-control" id="fecha_firma_ip" formControlName="fecha_firma_ip">
+          </div>
+          
+          <!-- Presupuesto -->
+          <div class="col-md-6 mb-3">
+            <label for="presupuesto" class="form-label">Documento Presupuesto</label>
+            <div class="d-flex">
+              <input type="file" class="form-control" id="presupuesto_file" 
+                (change)="onDocumentoPresupuestoSeleccionado($event)" accept=".pdf,.jpg,.jpeg,.png"
+                [disabled]="cargandoDocumentoPresupuesto">
+              <button *ngIf="documentoPresupuesto" type="button" class="btn btn-primary ms-2" 
+                (click)="subirDocumentoPresupuesto()" [disabled]="cargandoDocumentoPresupuesto">
+                <i class="fa" [ngClass]="{'fa-upload': !cargandoDocumentoPresupuesto, 'fa-spinner fa-spin': cargandoDocumentoPresupuesto}"></i>
+              </button>
+              <button *ngIf="contratoForm.get('presupuesto')?.value" type="button" class="btn btn-outline-info ms-2" 
+                (click)="abrirDocumento(contratoForm.get('presupuesto')?.value)">
+                <i class="fa fa-eye"></i>
+              </button>
+            </div>
+            <small class="text-muted">Suba un nuevo documento o vea el actual</small>
+            <input type="hidden" formControlName="presupuesto">
+          </div>
+        </div>
+        
+        <div class="row">
+          <!-- Gerente -->
+          <div class="col-md-6 mb-3">
+            <label for="gerente" class="form-label">Nombre del Gerente</label>
+            <input type="text" class="form-control" id="gerente" formControlName="gerente">
+          </div>
+          
+          <!-- Fecha Firma Gerente -->
+          <div class="col-md-6 mb-3">
+            <label for="fecha_firma_gerente" class="form-label">Fecha Firma Gerente</label>
+            <input type="date" class="form-control" id="fecha_firma_gerente" formControlName="fecha_firma_gerente">
+          </div>
+        </div>
+        
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="documento_generado" formControlName="documento_generado">
+          <label class="form-check-label" for="documento_generado">
+            Documento Generado
+          </label>
+        </div>
+        
+        <div class="mb-3">
+          <label for="documento_firmado" class="form-label">Documento Firmado</label>
+          <div class="d-flex">
+            <input type="file" class="form-control" id="documento_firmado_file" 
+              (change)="onDocumentoFirmadoSeleccionado($event)" accept=".pdf,.jpg,.jpeg,.png"
+              [disabled]="cargandoDocumentoFirmado">
+            <button *ngIf="documentoFirmado" type="button" class="btn btn-primary ms-2" 
+              (click)="subirDocumentoFirmado()" [disabled]="cargandoDocumentoFirmado">
+              <i class="fa" [ngClass]="{'fa-upload': !cargandoDocumentoFirmado, 'fa-spinner fa-spin': cargandoDocumentoFirmado}"></i>
+            </button>
+            <button *ngIf="contratoForm.get('documento_firmado')?.value" type="button" class="btn btn-outline-info ms-2" 
+              (click)="abrirDocumento(contratoForm.get('documento_firmado')?.value)">
+              <i class="fa fa-eye"></i>
+            </button>
+          </div>
+          <small class="text-muted">Suba un nuevo documento o vea el actual</small>
+          <input type="hidden" formControlName="documento_firmado">
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-end mb-5">
+      <button type="submit" class="btn btn-primary" [disabled]="contratoForm.invalid || submitting">
+        <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
+        Guardar Cambios
+      </button>
+    </div>
+  </form>
+</div>

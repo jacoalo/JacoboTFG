@@ -1,0 +1,315 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-outline-secondary me-3" (click)="volverALista()">
+        <i class="fa fa-arrow-left"></i>
+      </button>
+      <h2 class="mb-0">Facturas del Contrato Menor</h2>
+    </div>
+    <div class="d-flex align-items-center">
+      <small class="text-muted me-3">
+        Contrato Menor ID: {{ contrato?.id }} | Proveedor: {{ contrato?.proveedor }} | CIF: {{ contrato?.cif }}
+      </small>
+      <button *ngIf="isGestor && !showFormNueva && !showFormEditar" type="button" class="btn btn-primary" (click)="iniciarNuevaFactura()">
+        <i class="fa fa-plus-circle me-1"></i> Nueva Factura
+      </button>
+    </div>
+  </div>
+
+  <!-- Mensajes de éxito -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
+
+  <!-- Spinner de carga -->
+  <div *ngIf="loading || loadingContrato" class="text-center p-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2">Cargando datos...</p>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="!loading && !loadingContrato && error" class="alert alert-danger">
+    {{ error }}
+    <button type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="error = ''">
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+
+  <!-- Formulario de Nueva Factura -->
+  <div *ngIf="showFormNueva && !loading && !loadingContrato" class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">Nueva Factura</h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="facturaForm" (ngSubmit)="guardarFactura()">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="IdFactura" class="form-label">ID Factura <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="IdFactura" formControlName="IdFactura" required>
+            <div *ngIf="facturaForm.get('IdFactura')?.invalid && facturaForm.get('IdFactura')?.touched" class="text-danger">
+              El ID de la factura es obligatorio
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="descripcion" class="form-label">Descripción <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="descripcion" formControlName="descripcion" required>
+            <div *ngIf="facturaForm.get('descripcion')?.invalid && facturaForm.get('descripcion')?.touched" class="text-danger">
+              La descripción es obligatoria
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="fecha_emision" class="form-label">Fecha de Emisión <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" id="fecha_emision" formControlName="fecha_emision" required>
+            <div *ngIf="facturaForm.get('fecha_emision')?.invalid && facturaForm.get('fecha_emision')?.touched" class="text-danger">
+              La fecha de emisión es obligatoria
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="fecha_pago" class="form-label">Fecha de Pago</label>
+            <input type="date" class="form-control" id="fecha_pago" formControlName="fecha_pago">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="documentoF" class="form-label">documentoF</label>
+            <input type="file" class="form-control" id="documentoF" (change)="onDocumentoFacturaSeleccionado($event)" accept=".pdf,.jpg,.jpeg,.png">
+            <small class="text-muted">Suba el documento PDF o imagen de la factura</small>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="documentoJP" class="form-label">documentoJP</label>
+            <input type="file" class="form-control" id="documentoJP" (change)="onDocumentoJustificanteSeleccionado($event)" accept=".pdf,.jpg,.jpeg,.png">
+            <small class="text-muted">Suba el documento justificante de pago</small>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="id_cm" class="form-label">id_cm <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="id_cm" formControlName="id_cm" readonly>
+            <small class="text-muted">Asociado automáticamente a este contrato</small>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end mt-3">
+          <button type="button" class="btn btn-secondary me-2" (click)="cancelarEdicion()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="facturaForm.invalid || submitting || cargandoDocumentoF || cargandoDocumentoJP">
+            <span *ngIf="submitting || cargandoDocumentoF || cargandoDocumentoJP" class="spinner-border spinner-border-sm me-1"></span>
+            Guardar Factura
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Formulario de Editar Factura -->
+  <div *ngIf="showFormEditar && !loading && !loadingContrato" class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">Editar Factura</h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="facturaForm" (ngSubmit)="guardarFactura()">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="IdFactura" class="form-label">ID Factura</label>
+            <input type="text" class="form-control" id="IdFactura" formControlName="IdFactura" readonly>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="descripcion" class="form-label">Descripción <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="descripcion" formControlName="descripcion" required>
+            <div *ngIf="facturaForm.get('descripcion')?.invalid && facturaForm.get('descripcion')?.touched" class="text-danger">
+              La descripción es obligatoria
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="fecha_emision" class="form-label">Fecha de Emisión <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" id="fecha_emision" formControlName="fecha_emision" required>
+            <div *ngIf="facturaForm.get('fecha_emision')?.invalid && facturaForm.get('fecha_emision')?.touched" class="text-danger">
+              La fecha de emisión es obligatoria
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="fecha_pago" class="form-label">Fecha de Pago</label>
+            <input type="date" class="form-control" id="fecha_pago" formControlName="fecha_pago">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="documentoF_edit" class="form-label">documentoF</label>
+            <div class="d-flex">
+              <input type="file" class="form-control" id="documentoF_edit" (change)="onDocumentoFacturaSeleccionado($event)" accept=".pdf,.jpg,.jpeg,.png">
+              <button *ngIf="facturaForm.get('documentoF')?.value" type="button" class="btn btn-outline-info ms-2" 
+                (click)="abrirDocumento(facturaForm.get('documentoF')?.value)">
+                <i class="fa fa-eye"></i>
+              </button>
+            </div>
+            <small class="text-muted">Suba un nuevo documento o vea el actual</small>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="documentoJP_edit" class="form-label">documentoJP</label>
+            <div class="d-flex">
+              <input type="file" class="form-control" id="documentoJP_edit" (change)="onDocumentoJustificanteSeleccionado($event)" accept=".pdf,.jpg,.jpeg,.png">
+              <button *ngIf="facturaForm.get('documentoJP')?.value" type="button" class="btn btn-outline-info ms-2" 
+                (click)="abrirDocumento(facturaForm.get('documentoJP')?.value)">
+                <i class="fa fa-eye"></i>
+              </button>
+            </div>
+            <small class="text-muted">Suba un nuevo documento o vea el actual</small>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="id_cm_edit" class="form-label">id_cm <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="id_cm_edit" formControlName="id_cm" readonly>
+            <small class="text-muted">Asociado automáticamente a este contrato</small>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end mt-3">
+          <button type="button" class="btn btn-secondary me-2" (click)="cancelarEdicion()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="facturaForm.invalid || submitting || cargandoDocumentoF || cargandoDocumentoJP">
+            <span *ngIf="submitting || cargandoDocumentoF || cargandoDocumentoJP" class="spinner-border spinner-border-sm me-1"></span>
+            Actualizar Factura
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sin facturas -->
+  <div *ngIf="!loading && !loadingContrato && !error && facturas.length === 0 && !showFormNueva && !showFormEditar" class="alert alert-info" role="alert">
+    No se encontraron facturas asociadas a este contrato menor.
+    <button *ngIf="isGestor" type="button" class="btn btn-primary btn-sm ms-3" (click)="iniciarNuevaFactura()">
+      Añadir factura
+    </button>
+  </div>
+
+  <!-- Tabla de facturas -->
+  <div *ngIf="!loading && !loadingContrato && !error && facturas.length > 0 && !showFormNueva && !showFormEditar" class="card">
+    <div class="card-body p-0">
+      <div class="d-flex justify-content-end p-2 border-bottom">
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cargarTodosLosArticulos()" 
+                [disabled]="loadingArticulos">
+          <i class="fa fa-list me-1"></i> Cargar todos los artículos
+          <span *ngIf="loadingArticulos" class="spinner-border spinner-border-sm ms-1"></span>
+        </button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">ID Factura</th>
+              <th scope="col">Descripción</th>
+              <th scope="col">Fecha Emisión</th>
+              <th scope="col">Fecha Pago</th>
+              <th scope="col">documentoF</th>
+              <th scope="col">documentoJP</th>
+              <th scope="col">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let factura of facturas" 
+               [class.table-primary]="facturaResaltadaId === factura.IdFactura"
+               [id]="'factura-' + factura.IdFactura">
+              <td>{{ factura.IdFactura }}</td>
+              <td>{{ factura.descripcion }}</td>
+              <td>{{ factura.fecha_emision | date:'dd/MM/yyyy' }}</td>
+              <td>{{ factura.fecha_pago | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <a *ngIf="factura.documentoF" class="btn btn-sm btn-outline-info" (click)="abrirDocumento(factura.documentoF)">
+                  <i class="fa fa-file me-1"></i> Ver
+                </a>
+                <span *ngIf="!factura.documentoF" class="badge bg-secondary">No disponible</span>
+              </td>
+              <td>
+                <a *ngIf="factura.documentoJP" class="btn btn-sm btn-outline-success" (click)="abrirDocumento(factura.documentoJP)">
+                  <i class="fa fa-file-text me-1"></i> Ver
+                </a>
+                <span *ngIf="!factura.documentoJP" class="badge bg-secondary">No disponible</span>
+              </td>
+              <td>
+                <div class="btn-group btn-group-sm">
+                  <button type="button" class="btn btn-outline-info" 
+                    title="Ver artículos asociados" (click)="verDetalle(factura.IdFactura)">
+                    <i class="fa" [ngClass]="{'fa-chevron-down': expandedFactura !== factura.IdFactura, 'fa-chevron-up': expandedFactura === factura.IdFactura}"></i> 
+                    Artículos
+                    <span *ngIf="articulosPorFactura.get(factura.IdFactura)" class="badge bg-primary ms-1">
+                      {{ articulosPorFactura.get(factura.IdFactura)!.length }}
+                    </span>
+                  </button>
+                  <button *ngIf="isGestor" type="button" class="btn btn-outline-primary" 
+                    title="Editar factura" (click)="iniciarEditarFactura(factura.IdFactura)">
+                    <i class="fa fa-edit"></i>
+                  </button>
+                  <button *ngIf="isGestor" type="button" class="btn btn-outline-danger" 
+                    title="Eliminar factura" (click)="eliminarFactura(factura.IdFactura)">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <!-- Fila expandible con los artículos de la factura -->
+            <tr *ngFor="let factura of facturas" [hidden]="expandedFactura !== factura.IdFactura">
+              <td colspan="8" class="p-0">
+                <div class="bg-light p-3 border-top">
+                  <h6 class="mb-3">Artículos asociados a la factura {{ factura.IdFactura }}</h6>
+                  
+                  <!-- Spinner de carga -->
+                  <div *ngIf="loadingArticulos" class="text-center my-3">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                      <span class="visually-hidden">Cargando artículos...</span>
+                    </div>
+                    <span class="ms-2">Cargando artículos...</span>
+                  </div>
+                  
+                  <!-- Sin artículos -->
+                  <div *ngIf="!loadingArticulos && articulosPorFactura.get(factura.IdFactura)?.length === 0" class="alert alert-info">
+                    No hay artículos asociados a esta factura.
+                  </div>
+                  
+                  <!-- Tabla de artículos -->
+                  <div *ngIf="!loadingArticulos && articulosPorFactura.get(factura.IdFactura) && articulosPorFactura.get(factura.IdFactura)!.length > 0" class="table-responsive">
+                    <div class="alert alert-success">
+                      <strong>Total artículos:</strong> {{ articulosPorFactura.get(factura.IdFactura)!.length }} | 
+                      <strong>Importe total:</strong> {{ calcularTotalArticulos(articulosPorFactura.get(factura.IdFactura)!) | number:'1.2-2' }} €
+                    </div>
+                    <table class="table table-sm table-striped">
+                      <thead class="table-light">
+                        <tr>
+                          <th>ID Artículo</th>
+                          <th>Descripción</th>
+                          <th>Cantidad</th>
+                          <th>Precio unitario</th>
+                          <th>Total</th>
+                          <th>Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let articulo of articulosPorFactura.get(factura.IdFactura)">
+                          <td>{{ articulo.id_art }}</td>
+                          <td>{{ articulo.descripcion }}</td>
+                          <td>{{ articulo.cantidad }}</td>
+                          <td>{{ articulo.precio | number:'1.2-2' }} €</td>
+                          <td>{{ articulo.cantidad * articulo.precio | number:'1.2-2' }} €</td>
+                          <td>
+                            <a [routerLink]="['/contratos-menores', articulo.id_cm, 'articulos']" 
+                               class="btn btn-sm btn-outline-primary">
+                              <i class="fa fa-external-link me-1"></i> Ver en artículos
+                            </a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

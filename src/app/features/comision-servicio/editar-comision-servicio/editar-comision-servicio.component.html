@@ -1,0 +1,398 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-outline-secondary me-3" (click)="volverALista()">
+        <i class="fa fa-arrow-left"></i>
+      </button>
+      <h2 class="mb-0">Editar Comisión de Servicio</h2>
+    </div>
+    <div class="mt-2">
+      <small class="text-muted">ID Comisión: {{ comisionId }}</small>
+    </div>
+  </div>
+
+  <!-- Mensajes de éxito -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
+
+  <!-- Spinner de carga -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2">Cargando datos de la comisión...</p>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="!loading && error" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''"></button>
+  </div>
+
+  <!-- Formulario de edición -->
+  <form *ngIf="!loading && !error" [formGroup]="comisionForm" (ngSubmit)="onSubmit()">
+    <!-- Información del Comisionado -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Información del Comisionado</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label for="nif_comisionado" class="form-label">NIF <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="nif_comisionado" formControlName="nif_comisionado">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="nombre" formControlName="nombre">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="apellido1" class="form-label">Primer Apellido <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="apellido1" formControlName="apellido1">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label for="apellido2" class="form-label">Segundo Apellido</label>
+            <input type="text" class="form-control" id="apellido2" formControlName="apellido2">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="cargo" class="form-label">Cargo <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="cargo" formControlName="cargo">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="grupo" class="form-label">Grupo</label>
+            <input type="number" class="form-control" id="grupo" formControlName="grupo">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información del Viaje -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Información del Viaje</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="proyecto" class="form-label">Proyecto <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="proyecto" formControlName="proyecto" readonly>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="motivo_viaje" class="form-label">Motivo del Viaje <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="motivo_viaje" formControlName="motivo_viaje">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="origen" class="form-label">Origen <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="origen" formControlName="origen">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="destino" class="form-label">Destino <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="destino" formControlName="destino">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <label for="fecha_inicio" class="form-label">Fecha Inicio <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" id="fecha_inicio" formControlName="fecha_inicio">
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="hinicio" class="form-label">Hora Inicio <span class="text-danger">*</span></label>
+            <input type="time" class="form-control" id="hinicio" formControlName="hinicio">
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="fecha_fin" class="form-label">Fecha Fin <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" id="fecha_fin" formControlName="fecha_fin">
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="hfin" class="form-label">Hora Fin <span class="text-danger">*</span></label>
+            <input type="time" class="form-control" id="hfin" formControlName="hfin">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Derechos y Gastos -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Derechos y Gastos</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="derecho_dietas" formControlName="derecho_dietas">
+              <label class="form-check-label" for="derecho_dietas">Derecho a Dietas</label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="gastos_viajes" formControlName="gastos_viajes">
+              <label class="form-check-label" for="gastos_viajes">Gastos de Viaje</label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="residencia" formControlName="residencia">
+              <label class="form-check-label" for="residencia">Residencia</label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="gastos_realizados" formControlName="gastos_realizados">
+              <label class="form-check-label" for="gastos_realizados">Gastos Realizados</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transporte -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Transporte</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="transporte_aereo" formControlName="transporte_aereo">
+              <label class="form-check-label" for="transporte_aereo">Transporte Aéreo</label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="vehiculo_particular" formControlName="vehiculo_particular">
+              <label class="form-check-label" for="vehiculo_particular">Vehículo Particular</label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="vehiculo_oficial" formControlName="vehiculo_oficial">
+              <label class="form-check-label" for="vehiculo_oficial">Vehículo Oficial</label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="matricula" class="form-label">Matrícula</label>
+            <input type="text" class="form-control" id="matricula" formControlName="matricula">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="gastos_garaje" formControlName="gastos_garaje">
+              <label class="form-check-label" for="gastos_garaje">Gastos de Garaje</label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="gastos_peaje" formControlName="gastos_peaje">
+              <label class="form-check-label" for="gastos_peaje">Gastos de Peaje</label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="transporte_vehiculo_barco" formControlName="transporte_vehiculo_barco">
+              <label class="form-check-label" for="transporte_vehiculo_barco">Transporte en Barco</label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="consigna_equipaje" formControlName="consigna_equipaje">
+              <label class="form-check-label" for="consigna_equipaje">Consigna de Equipaje</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Otros Gastos -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Otros Gastos</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="llamada_tfno_oficial" formControlName="llamada_tfno_oficial">
+              <label class="form-check-label" for="llamada_tfno_oficial">Llamada Teléfono Oficial</label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="gastos_lavanderia" formControlName="gastos_lavanderia">
+              <label class="form-check-label" for="gastos_lavanderia">Gastos de Lavandería</label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="tren_alta_velocidad" formControlName="tren_alta_velocidad">
+              <label class="form-check-label" for="tren_alta_velocidad">Tren Alta Velocidad</label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="tren_nocturno" formControlName="tren_nocturno">
+              <label class="form-check-label" for="tren_nocturno">Tren Nocturno</label>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="tren_convencional" formControlName="tren_convencional">
+              <label class="form-check-label" for="tren_convencional">Tren Convencional</label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="transporte_maritimo" formControlName="transporte_maritimo">
+              <label class="form-check-label" for="transporte_maritimo">Transporte Marítimo</label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="gastos_taxi_residencia" formControlName="gastos_taxi_residencia">
+              <label class="form-check-label" for="gastos_taxi_residencia">Taxi desde Residencia</label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="gastos_taxi_servicio" formControlName="gastos_taxi_servicio">
+              <label class="form-check-label" for="gastos_taxi_servicio">Taxi por Servicio</label>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="gastos_cena" formControlName="gastos_cena">
+              <label class="form-check-label" for="gastos_cena">Gastos de Cena</label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="gastos_reembolsables_ue" formControlName="gastos_reembolsables_ue">
+              <label class="form-check-label" for="gastos_reembolsables_ue">Gastos Reembolsables UE</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Autorización -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Autorización</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label for="autorizador" class="form-label">Autorizador</label>
+            <input type="text" class="form-control" id="autorizador" formControlName="autorizador">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="a_cargo" class="form-label">Cargo</label>
+            <input type="text" class="form-control" id="a_cargo" formControlName="a_cargo">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="a_localidad" class="form-label">Localidad</label>
+            <input type="text" class="form-control" id="a_localidad" formControlName="a_localidad">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label for="a_fecha_firma" class="form-label">Fecha de Firma</label>
+            <input type="date" class="form-control" id="a_fecha_firma" formControlName="a_fecha_firma">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documentación -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Documentación</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="d_generado" formControlName="d_generado">
+              <label class="form-check-label" for="d_generado">Documento Generado</label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="gastos_generados" class="form-label">Gastos Generados</label>
+            <input type="number" class="form-control" id="gastos_generados" formControlName="gastos_generados">
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="fecha_abono" class="form-label">Fecha de Abono</label>
+            <input type="date" class="form-control" id="fecha_abono" formControlName="fecha_abono">
+          </div>
+        </div>
+
+        <div class="row mt-4">
+          <div class="col-md-4 mb-3">
+            <label for="documento_firmado" class="form-label">Documento Firmado</label>
+            <div class="d-flex">
+              <input type="file" class="form-control" id="documento_firmado" 
+                (change)="onFileSelected($event, 'documento_firmado')" accept=".pdf,.doc,.docx">
+              <button *ngIf="comisionForm.get('documento_firmado')?.value" type="button" class="btn btn-outline-primary ms-2" 
+                (click)="abrirDocumento(comisionForm.get('documento_firmado')?.value)">
+                <i class="fa fa-download me-1"></i>
+              </button>
+            </div>
+            <small *ngIf="!comisionForm.get('documento_firmado')?.value" class="text-muted">Suba el documento firmado de la comisión</small>
+            <small *ngIf="comisionForm.get('documento_firmado')?.value" class="text-muted">Subir otro documento firmado</small>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="documentacion_gastos" class="form-label">Documentación de Gastos</label>
+            <div class="d-flex">
+              <input type="file" class="form-control" id="documentacion_gastos" 
+                (change)="onFileSelected($event, 'documentacion_gastos')" accept=".pdf,.doc,.docx">
+              <button *ngIf="comisionForm.get('documentacion_gastos')?.value" type="button" class="btn btn-outline-primary ms-2" 
+                (click)="abrirDocumento(comisionForm.get('documentacion_gastos')?.value)">
+                <i class="fa fa-download me-1"></i>
+              </button>
+            </div>
+            <small *ngIf="!comisionForm.get('documentacion_gastos')?.value" class="text-muted">Suba la documentación de los gastos realizados</small>
+            <small *ngIf="comisionForm.get('documentacion_gastos')?.value" class="text-muted">Subir otra documentación de gastos</small>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="documento_jp" class="form-label">Documento JP</label>
+            <div class="d-flex">
+              <input type="file" class="form-control" id="documento_jp" 
+                (change)="onFileSelected($event, 'documento_jp')" accept=".pdf,.doc,.docx">
+              <button *ngIf="comisionForm.get('documento_jp')?.value" type="button" class="btn btn-outline-primary ms-2" 
+                (click)="abrirDocumento(comisionForm.get('documento_jp')?.value)">
+                <i class="fa fa-download me-1"></i>
+              </button>
+            </div>
+            <small *ngIf="!comisionForm.get('documento_jp')?.value" class="text-muted">Suba el documento de justificación de pago</small>
+            <small *ngIf="comisionForm.get('documento_jp')?.value" class="text-muted">Subir otro documento JP</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="row mb-4">
+      <div class="col-12 d-flex justify-content-end">
+        <button type="button" class="btn btn-outline-secondary me-2" (click)="volverALista()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="saving || cargandoDocumentoFirmado || cargandoDocumentacionGastos || cargandoDocumentoJP">
+          <span *ngIf="saving || cargandoDocumentoFirmado || cargandoDocumentacionGastos || cargandoDocumentoJP" class="spinner-border spinner-border-sm me-1"></span>
+          Guardar Cambios
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

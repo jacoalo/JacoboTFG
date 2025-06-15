@@ -1,0 +1,78 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <button (click)="volverALista()" class="btn btn-outline-secondary me-3">
+        <i class="fa fa-arrow-left"></i>
+      </button>
+      <h2 class="mb-0">Detalle de Gasto de Personal</h2>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <!-- Mensaje de error -->
+      <div *ngIf="error" class="alert alert-danger">
+        {{ error }}
+      </div>
+
+      <!-- Loading spinner -->
+      <div *ngIf="loading" class="text-center p-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-2">Cargando información del gasto...</p>
+      </div>
+
+      <!-- Detalles del gasto -->
+      <div *ngIf="!loading && gasto && personal" class="row">
+        <!-- Información del personal -->
+        <div class="col-md-6 mb-4">
+          <h5 class="card-title mb-3">Información del Personal</h5>
+          <div class="mb-3">
+            <strong>Nombre:</strong>
+            <p>{{ personal.nombre }} {{ personal.apellido1 }} {{ personal.apellido2 || '' }}</p>
+          </div>
+          <div class="mb-3">
+            <strong>DNI:</strong>
+            <p>{{ personal.dni }}</p>
+          </div>
+        </div>
+
+        <!-- Información del gasto -->
+        <div class="col-md-6 mb-4">
+          <h5 class="card-title mb-3">Información del Gasto</h5>
+          <div class="mb-3">
+            <strong>Tipo de Gasto:</strong>
+            <p>{{ gasto.tipo_gasto }}</p>
+          </div>
+          <div class="mb-3">
+            <strong>Importe:</strong>
+            <p>{{ gasto.importe | currency:'EUR' }}</p>
+          </div>
+          <div class="mb-3">
+            <strong>Período:</strong>
+            <p>{{ getMesNombre(gasto.mes) }} {{ gasto.anio }}</p>
+          </div>
+          <div class="mb-3">
+            <strong>Proyecto:</strong>
+            <p>{{ gasto.proyecto }}</p>
+          </div>
+        </div>
+
+        <!-- Documento -->
+        <div class="col-12">
+          <h5 class="card-title mb-3">Documento</h5>
+          <div *ngIf="gasto.documento" class="mb-3">
+            <a [href]="getDocumentoUrl(gasto.documento)" target="_blank" class="btn btn-primary">
+              <i class="fa fa-file-pdf-o me-2"></i> Ver documento
+            </a>
+          </div>
+          <div *ngIf="!gasto.documento" class="alert alert-warning">
+            <i class="fa fa-exclamation-triangle me-2"></i>
+            No hay documento adjunto
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

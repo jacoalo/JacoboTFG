@@ -1,0 +1,72 @@
+<div class="container-fluid py-4" [@fadeAnimation]>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-outline-secondary me-3" (click)="volverALista()">
+        <i class="fa fa-arrow-left"></i>
+      </button>
+      <h2 class="mb-0">
+        <i class="fa fa-user me-2"></i> Detalle de Usuario
+      </h2>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center p-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2">Cargando información del usuario...</p>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger" [@slideInOutAnimation]>
+    {{ error }}
+    <button type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="cargarUsuario()">
+      <i class="fa fa-refresh"></i> Reintentar
+    </button>
+  </div>
+
+  <div *ngIf="!loading && !error && usuario" [@listAnimation]="'in'">
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-light">
+        <h5 class="card-title mb-0">Información Personal</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <h6 class="text-muted">DNI</h6>
+            <p class="mb-0 fs-5">{{ usuario.dni }}</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <h6 class="text-muted">Nombre Completo</h6>
+            <p class="mb-0 fs-5">{{ usuario.nombre }} {{ usuario.apellido1 }} {{ usuario.apellido2 }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-light">
+        <h5 class="card-title mb-0">Información de Cuenta</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <h6 class="text-muted">Nombre de Usuario</h6>
+            <p class="mb-0 fs-5">{{ usuario.login }}</p>
+          </div>
+          <div class="col-md-6 mb-3">
+            <h6 class="text-muted">Rol</h6>
+            <span class="badge fs-6" [ngClass]="usuario.investigador ? 'bg-info' : 'bg-primary'">
+              {{ usuario.investigador ? 'Investigador' : 'Gestor' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+      <button class="btn btn-warning" (click)="editarUsuario()">
+        <i class="fa fa-edit me-2"></i> Editar
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,138 @@
+<div class="container-fluid py-4" [@fadeAnimation]>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <a routerLink="/dashboard" class="btn btn-outline-secondary me-3">
+        <i class="fa fa-arrow-left"></i>
+      </a>
+      <h2 class="mb-0">
+        <i class="fa fa-edit me-2"></i> Editar Usuario
+      </h2>
+    </div>
+    <button class="btn btn-outline-secondary" (click)="cancelar()">
+      <i class="fa fa-times me-2"></i> Cancelar
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="text-center p-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2">Cargando información del usuario...</p>
+  </div>
+
+  <div *ngIf="error && !loading" class="alert alert-danger" [@slideInOutAnimation]>
+    {{ error }}
+    <button *ngIf="!submitting" type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="cargarUsuario()">
+      <i class="fa fa-refresh"></i> Reintentar
+    </button>
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success" [@slideInOutAnimation]>
+    {{ successMessage }}
+  </div>
+
+  <form *ngIf="!loading && !error && !successMessage" #usuarioForm="ngForm" (ngSubmit)="guardarCambios()" [@listAnimation]="usuarioForm.status">
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-light">
+        <h5 class="card-title mb-0">Información Personal</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <!-- DNI -->
+          <div class="col-md-6 mb-3">
+            <label for="dni" class="form-label">DNI <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="dni" name="dni" 
+                  [(ngModel)]="usuario.dni" required #dniInput="ngModel" readonly>
+            <div *ngIf="dniInput.invalid && (dniInput.dirty || dniInput.touched)" class="text-danger">
+              El DNI es obligatorio
+            </div>
+          </div>
+
+          <!-- Nombre -->
+          <div class="col-md-6 mb-3">
+            <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="nombre" name="nombre" 
+                  [(ngModel)]="usuario.nombre" required #nombreInput="ngModel">
+            <div *ngIf="nombreInput.invalid && (nombreInput.dirty || nombreInput.touched)" class="text-danger">
+              El nombre es obligatorio
+            </div>
+          </div>
+
+          <!-- Apellido1 -->
+          <div class="col-md-6 mb-3">
+            <label for="apellido1" class="form-label">Primer Apellido <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="apellido1" name="apellido1" 
+                  [(ngModel)]="usuario.apellido1" required #apellido1Input="ngModel">
+            <div *ngIf="apellido1Input.invalid && (apellido1Input.dirty || apellido1Input.touched)" class="text-danger">
+              El primer apellido es obligatorio
+            </div>
+          </div>
+
+          <!-- Apellido2 -->
+          <div class="col-md-6 mb-3">
+            <label for="apellido2" class="form-label">Segundo Apellido</label>
+            <input type="text" class="form-control" id="apellido2" name="apellido2" 
+                  [(ngModel)]="usuario.apellido2">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-light">
+        <h5 class="card-title mb-0">Información de Cuenta</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <!-- Login -->
+          <div class="col-md-6 mb-3">
+            <label for="login" class="form-label">Nombre de Usuario <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="login" name="login" 
+                  [(ngModel)]="usuario.login" required #loginInput="ngModel">
+            <div *ngIf="loginInput.invalid && (loginInput.dirty || loginInput.touched)" class="text-danger">
+              El nombre de usuario es obligatorio
+            </div>
+          </div>
+
+          <!-- Contraseña -->
+          <div class="col-md-6 mb-3">
+            <label for="password" class="form-label">Contraseña <span class="text-info">*</span></label>
+            <input type="password" class="form-control" id="password" name="password" 
+                 [(ngModel)]="usuario.password" #passwordInput="ngModel" placeholder="Nueva contraseña">
+            <div class="form-text">Dejar en blanco para mantener la contraseña actual</div>
+          </div>
+
+          <!-- Rol -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Rol <span class="text-danger">*</span></label>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="rolGestor" name="investigador" 
+                    [value]="false" [(ngModel)]="usuario.investigador">
+              <label class="form-check-label" for="rolGestor">
+                Gestor
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="rolInvestigador" name="investigador" 
+                    [value]="true" [(ngModel)]="usuario.investigador">
+              <label class="form-check-label" for="rolInvestigador">
+                Investigador
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+      <button type="button" class="btn btn-outline-secondary" (click)="cancelar()">
+        <i class="fa fa-times me-2"></i> Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="usuarioForm.invalid || submitting">
+        <i *ngIf="submitting" class="fa fa-spinner fa-spin me-2"></i>
+        <i *ngIf="!submitting" class="fa fa-save me-2"></i>
+        Guardar Cambios
+      </button>
+    </div>
+  </form>
+</div>

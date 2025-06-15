@@ -1,0 +1,6 @@
+npm ERR! Missing script: "dev"
+npm ERR! 
+npm ERR! To see a list of scripts, run:
+npm ERR!   npm run
+
+npm ERR! A complete log of this run can be found in: /Users/chema/.npm/_logs/2025-05-14T10_43_05_844Z-debug-0.log

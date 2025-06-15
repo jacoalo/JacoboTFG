@@ -1,0 +1,144 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Editar Proyecto</h2>
+    <button class="btn btn-outline-secondary me-3" (click)="volverALista()">
+      <i class="fa fa-arrow-left"></i>
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="text-center p-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2">Cargando información del proyecto...</p>
+  </div>
+
+  <div *ngIf="!loading && error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success">
+    {{ successMessage }}
+  </div>
+
+  <div *ngIf="!loading && proyecto" class="row">
+    <div class="col-md-12">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Información General</h5>
+        </div>
+        <div class="card-body">
+          <form (ngSubmit)="guardarCambios()" #proyectoForm="ngForm">
+            <div class="row mb-3">
+              <!-- ID Proyecto -->
+              <div class="col-md-6 mb-3">
+                <label for="idProyecto" class="form-label">ID Proyecto <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="idProyecto" name="idProyecto" 
+                      [(ngModel)]="proyecto.IDProyecto" required #idProyecto="ngModel">
+                <div *ngIf="idProyecto.invalid && (idProyecto.dirty || idProyecto.touched)" class="text-danger">
+                  El ID del proyecto es obligatorio
+                </div>
+              </div>
+
+              <!-- Investigador Principal -->
+              <div class="col-md-6 mb-3">
+                <label for="ip" class="form-label">Investigador Principal <span class="text-danger">*</span></label>
+                <select class="form-select" id="ip" name="ip" [(ngModel)]="proyecto.ip" required #ip="ngModel">
+                  <option value="" disabled>Seleccione un investigador</option>
+                  <option *ngFor="let inv of investigadores" [value]="inv.dni">{{ inv.nombre }} {{ inv.apellido1 }}</option>
+                </select>
+                <div *ngIf="ip.invalid && (ip.dirty || ip.touched)" class="text-danger">
+                  Debe seleccionar un Investigador Principal
+                </div>
+                <div *ngIf="cargandoInvestigadores" class="mt-2">
+                  <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                  </div>
+                  <span class="ms-2">Cargando investigadores...</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Finalidad -->
+            <div class="mb-4">
+              <label for="finalidad" class="form-label">Finalidad <span class="text-danger">*</span></label>
+              <textarea class="form-control" id="finalidad" name="finalidad" rows="3" 
+                       [(ngModel)]="proyecto.finalidad" required #finalidad="ngModel"></textarea>
+              <div *ngIf="finalidad.invalid && (finalidad.dirty || finalidad.touched)" class="text-danger">
+                La finalidad del proyecto es obligatoria
+              </div>
+            </div>
+
+            <div class="card mb-4">
+              <div class="card-header bg-light">
+                <h6 class="mb-0">Información Económica</h6>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <!-- Anualidades -->
+                  <div class="col-md-2 mb-3">
+                    <label for="a2024" class="form-label">2024 (€)</label>
+                    <input type="number" class="form-control" id="a2024" name="a2024" 
+                          [(ngModel)]="proyecto.a2024" min="0" step="0.01" (change)="actualizarTotal()">
+                  </div>
+                  <div class="col-md-2 mb-3">
+                    <label for="a2025" class="form-label">2025 (€)</label>
+                    <input type="number" class="form-control" id="a2025" name="a2025" 
+                          [(ngModel)]="proyecto.a2025" min="0" step="0.01" (change)="actualizarTotal()">
+                  </div>
+                  <div class="col-md-2 mb-3">
+                    <label for="a2026" class="form-label">2026 (€)</label>
+                    <input type="number" class="form-control" id="a2026" name="a2026" 
+                          [(ngModel)]="proyecto.a2026" min="0" step="0.01" (change)="actualizarTotal()">
+                  </div>
+                  <div class="col-md-2 mb-3">
+                    <label for="a2027" class="form-label">2027 (€)</label>
+                    <input type="number" class="form-control" id="a2027" name="a2027" 
+                          [(ngModel)]="proyecto.a2027" min="0" step="0.01" (change)="actualizarTotal()">
+                  </div>
+                  <div class="col-md-2 mb-3">
+                    <label for="a2028" class="form-label">2028 (€)</label>
+                    <input type="number" class="form-control" id="a2028" name="a2028" 
+                          [(ngModel)]="proyecto.a2028" min="0" step="0.01" (change)="actualizarTotal()">
+                  </div>
+                  <!-- Total -->
+                  <div class="col-md-2 mb-3">
+                    <label for="total" class="form-label">Total (€)</label>
+                    <input type="number" class="form-control" id="total" name="total" 
+                          [(ngModel)]="proyecto.cantidad_total" readonly>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <!-- ICU -->
+                  <div class="col-md-6 mb-3">
+                    <label for="icu" class="form-label">ICU</label>
+                    <input type="text" class="form-control" id="icu" name="icu" 
+                          [(ngModel)]="proyecto.icu">
+                  </div>
+
+                  <!-- Cuenta Interna -->
+                  <div class="col-md-6 mb-3">
+                    <label for="cuenta" class="form-label">Cuenta Interna</label>
+                    <input type="text" class="form-control" id="cuenta" name="cuenta" 
+                          [(ngModel)]="proyecto.cuenta_interna">
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="d-flex justify-content-end gap-2 mt-3">
+              <button type="button" class="btn btn-secondary" [routerLink]="['/proyectos', proyectoId]">
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary" [disabled]="proyectoForm.invalid || guardando">
+                <span *ngIf="guardando" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Guardar Cambios
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

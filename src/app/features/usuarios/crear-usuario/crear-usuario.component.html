@@ -1,0 +1,176 @@
+<div class="container-fluid py-4" [@fadeAnimation]>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <a routerLink="/dashboard" class="btn btn-outline-secondary me-3">
+        <i class="fa fa-arrow-left"></i>
+      </a>
+      <h2 class="mb-0">
+        <i class="fa fa-user-plus me-2"></i> Crear Usuario
+      </h2>
+    </div>
+    <button class="btn btn-outline-secondary" [routerLink]="['/usuarios']">
+      <i class="fa fa-times me-2"></i> Cancelar
+    </button>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="alert alert-danger" *ngIf="errorMessage" [@slideInOutAnimation]>
+        {{ errorMessage }}
+      </div>
+      <div class="alert alert-success" *ngIf="successMessage" [@slideInOutAnimation]>
+        {{ successMessage }}
+      </div>
+
+      <form (ngSubmit)="crearUsuario()" #usuarioForm="ngForm" [@listAnimation]="usuarioForm.status">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="dni" class="form-label">DNI *</label>
+            <input 
+              type="text" 
+              id="dni" 
+              name="dni" 
+              class="form-control" 
+              [(ngModel)]="usuario.dni"
+              required
+              pattern="^\d{8}[A-Za-z]$"
+              #dniField="ngModel"
+              [ngClass]="{'is-invalid': dniField.invalid && (dniField.dirty || dniField.touched)}"
+              placeholder="Ej: 12345678A">
+            <div class="invalid-feedback" *ngIf="dniField.invalid && (dniField.dirty || dniField.touched)">
+              <span *ngIf="dniField.errors?.['required']">El DNI es obligatorio</span>
+              <span *ngIf="dniField.errors?.['pattern']">El DNI debe tener 8 números seguidos de una letra</span>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label for="login" class="form-label">Usuario *</label>
+            <input 
+              type="text" 
+              id="login" 
+              name="login" 
+              class="form-control" 
+              [(ngModel)]="usuario.login"
+              required
+              #loginField="ngModel"
+              [ngClass]="{'is-invalid': loginField.invalid && (loginField.dirty || loginField.touched)}"
+              placeholder="Nombre de usuario">
+            <div class="invalid-feedback" *ngIf="loginField.invalid && (loginField.dirty || loginField.touched)">
+              El nombre de usuario es obligatorio
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="password" class="form-label">Contraseña *</label>
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              class="form-control" 
+              [(ngModel)]="usuario.password"
+              required
+              #passwordField="ngModel"
+              [ngClass]="{'is-invalid': passwordField.invalid && (passwordField.dirty || passwordField.touched)}"
+              placeholder="Contraseña">
+            <div class="invalid-feedback" *ngIf="passwordField.invalid && (passwordField.dirty || passwordField.touched)">
+              La contraseña es obligatoria
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label for="confirmPassword" class="form-label">Confirmar Contraseña *</label>
+            <input 
+              type="password" 
+              id="confirmPassword" 
+              name="confirmPassword" 
+              class="form-control" 
+              [(ngModel)]="confirmPassword"
+              required
+              #confirmPasswordField="ngModel"
+              [ngClass]="{'is-invalid': confirmPasswordField.invalid && (confirmPasswordField.dirty || confirmPasswordField.touched)}"
+              placeholder="Confirmar contraseña">
+            <div class="invalid-feedback" *ngIf="confirmPasswordField.invalid && (confirmPasswordField.dirty || confirmPasswordField.touched)">
+              Debes confirmar la contraseña
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="nombre" class="form-label">Nombre *</label>
+            <input 
+              type="text" 
+              id="nombre" 
+              name="nombre" 
+              class="form-control" 
+              [(ngModel)]="usuario.nombre"
+              required
+              #nombreField="ngModel"
+              [ngClass]="{'is-invalid': nombreField.invalid && (nombreField.dirty || nombreField.touched)}"
+              placeholder="Nombre">
+            <div class="invalid-feedback" *ngIf="nombreField.invalid && (nombreField.dirty || nombreField.touched)">
+              El nombre es obligatorio
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label for="apellido1" class="form-label">Primer Apellido *</label>
+            <input 
+              type="text" 
+              id="apellido1" 
+              name="apellido1" 
+              class="form-control" 
+              [(ngModel)]="usuario.apellido1"
+              required
+              #apellido1Field="ngModel"
+              [ngClass]="{'is-invalid': apellido1Field.invalid && (apellido1Field.dirty || apellido1Field.touched)}"
+              placeholder="Primer apellido">
+            <div class="invalid-feedback" *ngIf="apellido1Field.invalid && (apellido1Field.dirty || apellido1Field.touched)">
+              El primer apellido es obligatorio
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <label for="apellido2" class="form-label">Segundo Apellido</label>
+            <input 
+              type="text" 
+              id="apellido2" 
+              name="apellido2" 
+              class="form-control" 
+              [(ngModel)]="usuario.apellido2"
+              placeholder="Segundo apellido (opcional)">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Tipo de Usuario *</label>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="rolGestor" name="investigador" 
+                    [value]="false" [(ngModel)]="usuario.investigador">
+              <label class="form-check-label" for="rolGestor">
+                Gestor
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="rolInvestigador" name="investigador" 
+                    [value]="true" [(ngModel)]="usuario.investigador">
+              <label class="form-check-label" for="rolInvestigador">
+                Investigador
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-secondary" [routerLink]="['/usuarios']">Cancelar</button>
+          <button 
+            type="submit" 
+            class="btn btn-primary" 
+            [disabled]="usuarioForm.invalid || loading">
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" *ngIf="loading"></span>
+            Crear Usuario
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,135 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-outline-secondary me-3" (click)="volverALista()">
+        <i class="fa fa-arrow-left"></i>
+      </button>
+      <h2 class="mb-0">{{ isEditing ? 'Editar Personal' : 'Nuevo Personal' }}</h2>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form [formGroup]="personalForm" (ngSubmit)="onSubmit()">
+        <!-- Mensajes de error -->
+        <div *ngIf="error" class="alert alert-danger">
+          {{ error }}
+        </div>
+
+        <!-- Loading spinner -->
+        <div *ngIf="loading" class="text-center p-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+          <p class="mt-2">Cargando información...</p>
+        </div>
+
+        <!-- Formulario -->
+        <div *ngIf="!loading" class="row">
+          <!-- DNI -->
+          <div class="col-md-6 mb-3">
+            <label for="dni" class="form-label">DNI</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="dni" 
+              formControlName="dni"
+              [class.is-invalid]="personalForm.get('dni')?.invalid && personalForm.get('dni')?.touched"
+              placeholder="12345678A">
+            <div *ngIf="personalForm.get('dni')?.invalid && personalForm.get('dni')?.touched" class="invalid-feedback">
+              <span *ngIf="personalForm.get('dni')?.errors?.['required']">El DNI es obligatorio</span>
+              <span *ngIf="personalForm.get('dni')?.errors?.['pattern']">Formato de DNI inválido (8 números y 1 letra)</span>
+            </div>
+          </div>
+
+          <!-- Nombre -->
+          <div class="col-md-6 mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="nombre" 
+              formControlName="nombre"
+              [class.is-invalid]="personalForm.get('nombre')?.invalid && personalForm.get('nombre')?.touched">
+            <div *ngIf="personalForm.get('nombre')?.invalid && personalForm.get('nombre')?.touched" class="invalid-feedback">
+              El nombre es obligatorio
+            </div>
+          </div>
+
+          <!-- Apellido1 -->
+          <div class="col-md-6 mb-3">
+            <label for="apellido1" class="form-label">Primer Apellido</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="apellido1" 
+              formControlName="apellido1"
+              [class.is-invalid]="personalForm.get('apellido1')?.invalid && personalForm.get('apellido1')?.touched">
+            <div *ngIf="personalForm.get('apellido1')?.invalid && personalForm.get('apellido1')?.touched" class="invalid-feedback">
+              El primer apellido es obligatorio
+            </div>
+          </div>
+
+          <!-- Apellido2 -->
+          <div class="col-md-6 mb-3">
+            <label for="apellido2" class="form-label">Segundo Apellido</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="apellido2" 
+              formControlName="apellido2">
+          </div>
+
+          <!-- NSS -->
+          <div class="col-md-6 mb-3">
+            <label for="nss" class="form-label">Número de Seguridad Social</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="nss" 
+              formControlName="nss"
+              [class.is-invalid]="personalForm.get('nss')?.invalid && personalForm.get('nss')?.touched"
+              placeholder="123456789012">
+            <div *ngIf="personalForm.get('nss')?.invalid && personalForm.get('nss')?.touched" class="invalid-feedback">
+              <span *ngIf="personalForm.get('nss')?.errors?.['required']">El NSS es obligatorio</span>
+              <span *ngIf="personalForm.get('nss')?.errors?.['pattern']">Formato de NSS inválido (12 números)</span>
+            </div>
+          </div>
+
+          <!-- Fecha de Nacimiento -->
+          <div class="col-md-6 mb-3">
+            <label for="fecha_nac" class="form-label">Fecha de Nacimiento</label>
+            <input 
+              type="date" 
+              class="form-control" 
+              id="fecha_nac" 
+              formControlName="fecha_nac"
+              [class.is-invalid]="personalForm.get('fecha_nac')?.invalid && personalForm.get('fecha_nac')?.touched">
+            <div *ngIf="personalForm.get('fecha_nac')?.invalid && personalForm.get('fecha_nac')?.touched" class="invalid-feedback">
+              La fecha de nacimiento es obligatoria
+            </div>
+          </div>
+
+          <!-- Botones -->
+          <div class="col-12">
+            <div class="d-flex justify-content-end gap-2">
+              <button 
+                type="button" 
+                class="btn btn-secondary" 
+                (click)="cancelar()">
+                Cancelar
+              </button>
+              <button 
+                type="submit" 
+                class="btn btn-primary" 
+                [disabled]="personalForm.invalid || loading">
+                <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                {{ isEditing ? 'Guardar cambios' : 'Crear personal' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div> 

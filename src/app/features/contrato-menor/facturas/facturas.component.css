@@ -1,0 +1,39 @@
+/* Estilos para la animación de resaltado */
+@keyframes highlightFadeIn {
+  0% {
+    background-color: rgba(13, 110, 253, 0.8);
+    box-shadow: 0 0 15px rgba(13, 110, 253, 0.8);
+  }
+  100% {
+    background-color: rgba(13, 110, 253, 0.15);
+    box-shadow: none;
+  }
+}
+
+.highlight-animation {
+  animation: highlightFadeIn 2s ease-out;
+}
+
+/* Mejorar la apariencia de la tabla */
+.table-primary {
+  background-color: rgba(13, 110, 253, 0.15) !important;
+}
+
+/* Estilos para la tabla de artículos */
+.bg-light {
+  transition: all 0.3s ease;
+}
+
+/* Agregar borde izquierdo a la tabla de artículos para mejorar la visualización */
+.table-responsive table.table-sm {
+  border-left: 3px solid #0d6efd;
+}
+
+.table-responsive .alert-success {
+  border-left: 3px solid #198754;
+}
+
+/* Mejorar el espaciado para las filas expandibles */
+tr[hidden] {
+  display: none;
+}

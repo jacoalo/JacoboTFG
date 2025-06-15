@@ -1,0 +1,72 @@
+<div class="container-fluid min-vh-100 d-flex justify-content-center align-items-center bg-light">
+  <div class="card shadow-lg" style="max-width: 400px; width: 100%;">
+    <div class="card-header bg-primary text-white text-center py-3">
+      <h4 class="mb-0">Gestión Justificaciones</h4>
+    </div>
+    <div class="card-body p-4">
+      <div class="text-center mb-4">
+        <i class="fa fa-user-circle fa-4x text-primary mb-3"></i>
+        <h5 class="card-title">Iniciar Sesión</h5>
+      </div>
+      
+      <form (ngSubmit)="login()" #loginForm="ngForm">
+        <div class="alert alert-danger" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+
+        <div class="form-group mb-3">
+          <label for="username" class="form-label">Usuario</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fa fa-user"></i></span>
+            <input 
+              type="text" 
+              id="username" 
+              class="form-control" 
+              name="username"
+              [(ngModel)]="username"
+              required
+              #usernameField="ngModel"
+              [ngClass]="{'is-invalid': usernameField.invalid && (usernameField.dirty || usernameField.touched)}"
+              placeholder="Introduce tu usuario">
+          </div>
+          <div class="invalid-feedback" *ngIf="usernameField.invalid && (usernameField.dirty || usernameField.touched)">
+            El usuario es obligatorio
+          </div>
+        </div>
+
+        <div class="form-group mb-4">
+          <label for="password" class="form-label">Contraseña</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fa fa-lock"></i></span>
+            <input 
+              type="password" 
+              id="password" 
+              class="form-control" 
+              name="password"
+              [(ngModel)]="password"
+              required
+              #passwordField="ngModel"
+              [ngClass]="{'is-invalid': passwordField.invalid && (passwordField.dirty || passwordField.touched)}"
+              placeholder="Introduce tu contraseña">
+          </div>
+          <div class="invalid-feedback" *ngIf="passwordField.invalid && (passwordField.dirty || passwordField.touched)">
+            La contraseña es obligatoria
+          </div>
+        </div>
+
+        <div class="d-grid">
+          <button 
+            type="submit" 
+            class="btn btn-primary" 
+            [disabled]="loginForm.invalid || loading">
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" *ngIf="loading"></span>
+            Acceder
+          </button>
+        </div>
+      </form>
+    </div>
+    <div class="card-footer text-center py-3">
+      <p class="text-muted mb-0">&copy; 2025 - Gestión Justificaciones</p>
+    </div>
+  </div>
+</div> 

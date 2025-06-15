@@ -1,0 +1,40 @@
+.card {
+  border-radius: 10px;
+  border: none;
+}
+
+.card-header {
+  border-radius: 10px 10px 0 0;
+}
+
+.card-footer {
+  border-radius: 0 0 10px 10px;
+}
+
+.input-group-text {
+  background-color: transparent;
+  border-right: none;
+}
+
+.form-control {
+  border-left: none;
+}
+
+.form-control:focus {
+  box-shadow: none;
+  border-color: #ced4da;
+}
+
+.btn-primary {
+  transition: all 0.3s;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Para evitar que el spinner desaparezca */
+.spinner-border {
+  display: inline-block;
+} 

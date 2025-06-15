@@ -1,0 +1,190 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-outline-secondary me-3" (click)="volverALista()">
+        <i class="fa fa-arrow-left"></i>
+      </button>
+      <h2 class="mb-0">Detalle del Proyecto</h2>
+    </div>
+    <div class="btn-group" *ngIf="!loading && proyecto">
+      <button 
+        *ngIf="isGestor" 
+        class="btn btn-warning" 
+        [routerLink]="['/proyectos', proyecto.IDProyecto, 'editar']">
+        <i class="fa fa-edit me-2"></i> Editar
+      </button>
+      <button 
+        class="btn btn-info" 
+        [routerLink]="['/proyectos', proyecto.IDProyecto, 'gastos']">
+        <i class="fa fa-list me-2"></i> Ver Gastos
+      </button>
+      <button 
+        class="btn btn-success" 
+        (click)="descargarDocumentacion()">
+        <i class="fa fa-download me-2"></i> Descargar Documentación
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center p-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2">Cargando información del proyecto...</p>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+    <button *ngIf="proyecto" type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="cargarProyecto(proyecto.IDProyecto)">
+      <i class="fa fa-refresh"></i> Reintentar
+    </button>
+  </div>
+
+  <div *ngIf="!loading && !error && proyecto" class="row">
+    <div class="col-md-12 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Información General</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <strong>ID Proyecto:</strong>
+              <p class="mb-0">{{ proyecto.IDProyecto }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <strong>Investigador Principal:</strong>
+              <p class="mb-0">
+                <span *ngIf="investigador; else cargandoInv">
+                  {{ investigador.nombre }} {{ investigador.apellido1 }} {{ investigador.apellido2 || '' }}
+                </span>
+                <ng-template #cargandoInv>
+                  <span *ngIf="proyecto?.ip; else noInvestigador">
+                    <i class="fa fa-spinner fa-spin me-1"></i> Cargando datos del investigador...
+                  </span>
+                  <ng-template #noInvestigador>
+                    <span class="text-muted">No disponible</span>
+                  </ng-template>
+                </ng-template>
+              </p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 mb-3">
+              <strong>Finalidad:</strong>
+              <p class="mb-0">{{ proyecto.finalidad }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Información Económica</h5>
+        </div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-6">
+              <strong>Cantidad Total:</strong>
+              <p class="mb-0">{{ proyecto.cantidad_total ? (proyecto.cantidad_total | currency:'EUR') : '0,00 €' }}</p>
+            </div>
+            <div class="col-6">
+              <strong>ICU:</strong>
+              <p class="mb-0">{{ proyecto.icu ? proyecto.icu : 'No disponible' }}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <strong>Cuenta Interna:</strong>
+              <p class="mb-0">{{ proyecto.cuenta_interna ? proyecto.cuenta_interna : 'No disponible' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Anualidades</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4 mb-2">
+              <strong>2024:</strong>
+              <p class="mb-0">{{ proyecto.a2024 ? (proyecto.a2024 | currency:'EUR') : '0,00 €' }}</p>
+            </div>
+            <div class="col-md-4 mb-2">
+              <strong>2025:</strong>
+              <p class="mb-0">{{ proyecto.a2025 ? (proyecto.a2025 | currency:'EUR') : '0,00 €' }}</p>
+            </div>
+            <div class="col-md-4 mb-2">
+              <strong>2026:</strong>
+              <p class="mb-0">{{ proyecto.a2026 ? (proyecto.a2026 | currency:'EUR') : '0,00 €' }}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4 mb-2">
+              <strong>2027:</strong>
+              <p class="mb-0">{{ proyecto.a2027 ? (proyecto.a2027 | currency:'EUR') : '0,00 €' }}</p>
+            </div>
+            <div class="col-md-4 mb-2">
+              <strong>2028:</strong>
+              <p class="mb-0">{{ proyecto.a2028 ? (proyecto.a2028 | currency:'EUR') : '0,00 €' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-12 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Opciones de Gestión</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <div class="card h-100 bg-light">
+                <div class="card-body text-center">
+                  <i class="fa fa-file-text fa-3x mb-3 text-primary"></i>
+                  <h5>Contratos Menores</h5>
+                  <p>Gestión de contratos menores del proyecto</p>
+                  <a [routerLink]="['/contratos-menores/proyecto', proyecto.IDProyecto]" class="btn btn-outline-primary">
+                    Gestionar
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="card h-100 bg-light">
+                <div class="card-body text-center">
+                  <i class="fa fa-plane fa-3x mb-3 text-primary"></i>
+                  <h5>Comisiones de Servicio</h5>
+                  <p>Gestión de comisiones de servicio</p>
+                  <a [routerLink]="['/comisiones-servicio/proyecto', proyecto.IDProyecto]" class="btn btn-outline-primary">
+                    Gestionar
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="card h-100 bg-light">
+                <div class="card-body text-center">
+                  <i class="fa fa-users fa-3x mb-3 text-primary"></i>
+                  <h5>Gastos de Personal</h5>
+                  <p>Gestión de gastos de personal</p>
+                  <a [routerLink]="['/gastos-personal/proyecto', proyecto.IDProyecto]" class="btn btn-outline-primary">
+                    Gestionar
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

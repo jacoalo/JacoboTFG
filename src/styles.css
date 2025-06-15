@@ -1,0 +1,73 @@
+/* You can add global styles to this file, and also import other style files */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'font-awesome/css/font-awesome.min.css';
+
+/* Estilos globales */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #f8f9fa;
+}
+
+/* Estilos para mejorar la accesibilidad */
+:root {
+  --font-size-base: 16px;
+  --line-height-base: 1.5;
+}
+
+body {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+}
+
+/* Contraste para texto importante */
+.text-primary, h1, h2, h3, h4, h5, h6 {
+  color: #0056b3 !important;
+}
+
+/* Mejoras de accesibilidad para botones */
+.btn {
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+/* Asegurar contraste adecuado en formularios */
+label {
+  font-weight: 500;
+  color: #333;
+}
+
+input, select, textarea {
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
+/* Mejoras para encabezados de tarjetas */
+.card-header.bg-primary {
+  background-color: #0056b3 !important;
+}
+
+.card-header.bg-primary h5 {
+  color: #ffffff !important;
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.card-header.bg-primary .text-white {
+  color: #ffffff !important;
+  font-weight: 500;
+}
+
+/* Ajuste del color de fondo para mejor contraste */
+.bg-primary {
+  background-color: #0056b3 !important;
+}
+
+/* Ajuste del color de texto para mejor contraste */
+.text-primary {
+  color: #0056b3 !important;
+}

@@ -1,0 +1,466 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-outline-secondary me-3" (click)="volverALista()">
+        <i class="fa fa-arrow-left"></i>
+      </button>
+      <h2 class="mb-0">Nueva Comisión de Servicio</h2>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center p-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2">Preparando formulario...</p>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success">
+    {{ successMessage }}
+  </div>
+
+  <form [formGroup]="comisionForm" (ngSubmit)="onSubmit()" class="needs-validation" novalidate *ngIf="!loading">
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Información General</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label for="id_comision" class="form-label">ID Comisión</label>
+            <input type="text" class="form-control" id="id_comision" formControlName="id_comision" readonly>
+            <small class="text-muted">ID generado automáticamente</small>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="proyecto" class="form-label">Proyecto</label>
+            <input type="text" class="form-control" id="proyecto" formControlName="proyecto" readonly>
+            <small class="text-muted">Proyecto seleccionado</small>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label for="nif_comisionado" class="form-label">NIF/NIE Comisionado <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="nif_comisionado" formControlName="nif_comisionado" required
+              [ngClass]="{'is-invalid': comisionForm.get('nif_comisionado')?.invalid && comisionForm.get('nif_comisionado')?.touched}">
+            <div class="invalid-feedback">
+              El NIF/NIE es obligatorio
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="nombre" formControlName="nombre" required
+              [ngClass]="{'is-invalid': comisionForm.get('nombre')?.invalid && comisionForm.get('nombre')?.touched}">
+            <div class="invalid-feedback">
+              El nombre es obligatorio
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="apellido1" class="form-label">Primer Apellido <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="apellido1" formControlName="apellido1" required
+              [ngClass]="{'is-invalid': comisionForm.get('apellido1')?.invalid && comisionForm.get('apellido1')?.touched}">
+            <div class="invalid-feedback">
+              El primer apellido es obligatorio
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label for="apellido2" class="form-label">Segundo Apellido</label>
+            <input type="text" class="form-control" id="apellido2" formControlName="apellido2">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="cargo" class="form-label">Cargo <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="cargo" formControlName="cargo" required
+              [ngClass]="{'is-invalid': comisionForm.get('cargo')?.invalid && comisionForm.get('cargo')?.touched}">
+            <div class="invalid-feedback">
+              El cargo es obligatorio
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="grupo" class="form-label">Grupo <span class="text-danger">*</span></label>
+            <select class="form-select" id="grupo" formControlName="grupo" required
+              [ngClass]="{'is-invalid': comisionForm.get('grupo')?.invalid && comisionForm.get('grupo')?.touched}">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+            <div class="invalid-feedback">
+              El grupo es obligatorio
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Datos del Viaje</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-12 mb-3">
+            <label for="motivo_viaje" class="form-label">Motivo del viaje <span class="text-danger">*</span></label>
+            <textarea class="form-control" id="motivo_viaje" formControlName="motivo_viaje" rows="3" required
+              [ngClass]="{'is-invalid': comisionForm.get('motivo_viaje')?.invalid && comisionForm.get('motivo_viaje')?.touched}"></textarea>
+            <div class="invalid-feedback">
+              El motivo del viaje es obligatorio
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="origen" class="form-label">Origen <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="origen" formControlName="origen" required
+              [ngClass]="{'is-invalid': comisionForm.get('origen')?.invalid && comisionForm.get('origen')?.touched}">
+            <div class="invalid-feedback">
+              El origen es obligatorio
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="destino" class="form-label">Destino <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="destino" formControlName="destino" required
+              [ngClass]="{'is-invalid': comisionForm.get('destino')?.invalid && comisionForm.get('destino')?.touched}">
+            <div class="invalid-feedback">
+              El destino es obligatorio
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <label for="fecha_inicio" class="form-label">Fecha de inicio <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" id="fecha_inicio" formControlName="fecha_inicio" required
+              [ngClass]="{'is-invalid': comisionForm.get('fecha_inicio')?.invalid && comisionForm.get('fecha_inicio')?.touched}">
+            <div class="invalid-feedback">
+              La fecha de inicio es obligatoria
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="hinicio" class="form-label">Hora de inicio <span class="text-danger">*</span></label>
+            <input type="time" class="form-control" id="hinicio" formControlName="hinicio" required
+              [ngClass]="{'is-invalid': comisionForm.get('hinicio')?.invalid && comisionForm.get('hinicio')?.touched}">
+            <div class="invalid-feedback">
+              La hora de inicio es obligatoria
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="fecha_fin" class="form-label">Fecha de fin <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" id="fecha_fin" formControlName="fecha_fin" required
+              [ngClass]="{'is-invalid': comisionForm.get('fecha_fin')?.invalid && comisionForm.get('fecha_fin')?.touched}">
+            <div class="invalid-feedback">
+              La fecha de fin es obligatoria
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="hfin" class="form-label">Hora de fin <span class="text-danger">*</span></label>
+            <input type="time" class="form-control" id="hfin" formControlName="hfin" required
+              [ngClass]="{'is-invalid': comisionForm.get('hfin')?.invalid && comisionForm.get('hfin')?.touched}">
+            <div class="invalid-feedback">
+              La hora de fin es obligatoria
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Derechos y Gastos</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="derecho_dietas" formControlName="derecho_dietas">
+              <label class="form-check-label" for="derecho_dietas">
+                Derecho a dietas
+              </label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="gastos_viajes" formControlName="gastos_viajes">
+              <label class="form-check-label" for="gastos_viajes">
+                Gastos de viajes
+              </label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="residencia" formControlName="residencia">
+              <label class="form-check-label" for="residencia">
+                Residencia
+              </label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="gastos_realizados" formControlName="gastos_realizados">
+              <label class="form-check-label" for="gastos_realizados">
+                Gastos realizados
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Transporte</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="transporte_aereo" formControlName="transporte_aereo">
+              <label class="form-check-label" for="transporte_aereo">
+                Transporte aéreo
+              </label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="vehiculo_particular" formControlName="vehiculo_particular">
+              <label class="form-check-label" for="vehiculo_particular">
+                Vehículo particular
+              </label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="vehiculo_oficial" formControlName="vehiculo_oficial">
+              <label class="form-check-label" for="vehiculo_oficial">
+                Vehículo oficial
+              </label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3" *ngIf="comisionForm.get('vehiculo_particular')?.value || comisionForm.get('vehiculo_oficial')?.value">
+            <label for="matricula" class="form-label">Matrícula</label>
+            <input type="text" class="form-control" id="matricula" formControlName="matricula">
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="gastos_peaje" formControlName="gastos_peaje">
+              <label class="form-check-label" for="gastos_peaje">
+                Gastos de peaje
+              </label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="gastos_garaje" formControlName="gastos_garaje">
+              <label class="form-check-label" for="gastos_garaje">
+                Gastos de garaje
+              </label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="transporte_vehiculo_barco" formControlName="transporte_vehiculo_barco">
+              <label class="form-check-label" for="transporte_vehiculo_barco">
+                Transporte vehículo/barco
+              </label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="consigna_equipaje" formControlName="consigna_equipaje">
+              <label class="form-check-label" for="consigna_equipaje">
+                Consigna equipaje
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="tren_alta_velocidad" formControlName="tren_alta_velocidad">
+              <label class="form-check-label" for="tren_alta_velocidad">
+                Tren alta velocidad
+              </label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="tren_nocturno" formControlName="tren_nocturno">
+              <label class="form-check-label" for="tren_nocturno">
+                Tren nocturno
+              </label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="tren_convencional" formControlName="tren_convencional">
+              <label class="form-check-label" for="tren_convencional">
+                Tren convencional
+              </label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="transporte_maritimo" formControlName="transporte_maritimo">
+              <label class="form-check-label" for="transporte_maritimo">
+                Transporte marítimo
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Otros Gastos</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="llamada_tfno_oficial" formControlName="llamada_tfno_oficial">
+              <label class="form-check-label" for="llamada_tfno_oficial">
+                Llamada teléfono oficial
+              </label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="gastos_lavanderia" formControlName="gastos_lavanderia">
+              <label class="form-check-label" for="gastos_lavanderia">
+                Gastos lavandería
+              </label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="gastos_taxi_residencia" formControlName="gastos_taxi_residencia">
+              <label class="form-check-label" for="gastos_taxi_residencia">
+                Taxi residencia
+              </label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="gastos_taxi_servicio" formControlName="gastos_taxi_servicio">
+              <label class="form-check-label" for="gastos_taxi_servicio">
+                Taxi servicio
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="gastos_cena" formControlName="gastos_cena">
+              <label class="form-check-label" for="gastos_cena">
+                Gastos cena
+              </label>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="gastos_reembolsables_ue" formControlName="gastos_reembolsables_ue">
+              <label class="form-check-label" for="gastos_reembolsables_ue">
+                Gastos reembolsables UE
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Autorización</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <label for="autorizador" class="form-label">Autorizador</label>
+            <input type="text" class="form-control" id="autorizador" formControlName="autorizador">
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="a_cargo" class="form-label">Cargo</label>
+            <input type="text" class="form-control" id="a_cargo" formControlName="a_cargo">
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="a_localidad" class="form-label">Localidad</label>
+            <input type="text" class="form-control" id="a_localidad" formControlName="a_localidad">
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="a_fecha_firma" class="form-label">Fecha firma</label>
+            <input type="date" class="form-control" id="a_fecha_firma" formControlName="a_fecha_firma">
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Datos Económicos y Documentación</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label for="gastos_generados" class="form-label">Gastos generados (€)</label>
+            <input type="number" class="form-control" id="gastos_generados" formControlName="gastos_generados" min="0" step="0.01">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="fecha_abono" class="form-label">Fecha de abono</label>
+            <input type="date" class="form-control" id="fecha_abono" formControlName="fecha_abono">
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label for="documento_firmado" class="form-label">Documento Firmado</label>
+            <input type="file" class="form-control" id="documento_firmado" 
+              (change)="onFileSelected($event, 'documento_firmado')" accept=".pdf,.doc,.docx">
+            <small class="text-muted">Suba el documento firmado de la comisión</small>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="documentacion_gastos" class="form-label">Documentación de Gastos</label>
+            <input type="file" class="form-control" id="documentacion_gastos" 
+              (change)="onFileSelected($event, 'documentacion_gastos')" accept=".pdf,.doc,.docx">
+            <small class="text-muted">Suba la documentación de gastos</small>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label for="documento_jp" class="form-label">Documento JP</label>
+            <input type="file" class="form-control" id="documento_jp" 
+              (change)="onFileSelected($event, 'documento_jp')" accept=".pdf,.doc,.docx">
+            <small class="text-muted">Suba el documento JP</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row mb-4 mt-4">
+      <div class="col-12">
+        <div class="text-muted mb-3">
+          <small>Los campos marcados con <span class="text-danger">*</span> son obligatorios</small>
+        </div>
+        <div class="d-flex justify-content-end">
+          <button type="button" class="btn btn-outline-secondary me-2" (click)="volverALista()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="comisionForm.invalid || saving">
+            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            Guardar Comisión
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

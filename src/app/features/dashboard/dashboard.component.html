@@ -1,0 +1,125 @@
+<div class="container-fluid">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Gestión Justificaciones</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" [routerLink]="['/dashboard']">Inicio</a>
+          </li>
+          <li class="nav-item" *ngIf="isGestor()">
+            <a class="nav-link" [routerLink]="['/usuarios']">Gestión de Usuarios</a>
+          </li>
+          <li class="nav-item" *ngIf="isGestor()">
+            <a class="nav-link" [routerLink]="['/proyectos/nuevo']">Crear Proyecto</a>
+          </li>
+          <li class="nav-item" *ngIf="isGestor()">
+            <a class="nav-link" [routerLink]="['/personal']">Gestión de Personal</a>
+          </li>
+        </ul>
+        <div class="d-flex align-items-center">
+          <span class="text-white me-3">
+            <i class="fa fa-user-circle me-1"></i> {{ currentUser?.nombre }} {{ currentUser?.apellido1 }}
+          </span>
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+              Opciones
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
+              <li><a class="dropdown-item" [routerLink]="['/cambiar-password']">
+                <i class="fa fa-key me-2"></i> Cambiar Contraseña
+              </a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" (click)="$event.preventDefault(); logout()">
+                <i class="fa fa-sign-out me-2"></i> Cerrar Sesión
+              </a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+          <h5 class="card-title mb-0">
+            <i class="fa fa-folder-open me-2"></i> Proyectos
+          </h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="loading" class="text-center p-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="mt-2">Cargando proyectos...</p>
+          </div>
+
+          <div *ngIf="error" class="alert alert-danger">
+            {{ error }}
+            <button type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="loadProyectos()">
+              <i class="fa fa-refresh"></i> Reintentar
+            </button>
+          </div>
+
+          <div *ngIf="mensajeExito" class="alert alert-success">
+            {{ mensajeExito }}
+          </div>
+
+          <div *ngIf="!loading && !error">
+            <div *ngIf="proyectos.length === 0" class="text-center p-5">
+              <i class="fa fa-folder-open-o fa-4x text-muted mb-3"></i>
+              <h6 class="text-muted">No hay proyectos disponibles</h6>
+              <button *ngIf="isGestor()" class="btn btn-primary mt-3" [routerLink]="['/proyectos/nuevo']">
+                <i class="fa fa-plus-circle me-2"></i> Crear Proyecto
+              </button>
+            </div>
+
+            <div *ngIf="proyectos.length > 0" class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>ID Proyecto</th>
+                    <th>Finalidad</th>
+                    <th>Cantidad Total</th>
+                    <th>Investigador Principal</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let proyecto of proyectos">
+                    <td>{{ proyecto.IDProyecto }}</td>
+                    <td>{{ proyecto.finalidad }}</td>
+                    <td>{{ proyecto.cantidad_total | currency:'EUR' }}</td>
+                    <td>{{ getNombreInvestigador(proyecto.ip) }}</td>
+                    <td>
+                      <div class="btn-group btn-group-sm">
+                        <a [routerLink]="['/proyectos', proyecto.IDProyecto]" class="btn btn-primary">
+                          <i class="fa fa-eye"></i> Ver
+                        </a>
+                        <button *ngIf="isGestor()" [routerLink]="['/proyectos', proyecto.IDProyecto, 'editar']" class="btn btn-warning">
+                          <i class="fa fa-edit"></i> Editar
+                        </button>
+                        <a [routerLink]="['/proyectos', proyecto.IDProyecto, 'gastos']" class="btn btn-info">
+                          <i class="fa fa-list"></i> Gastos
+                        </a>
+                        <button *ngIf="isGestor()" class="btn btn-danger" (click)="eliminarProyecto(proyecto)">
+                          <i class="fa fa-trash"></i> Eliminar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

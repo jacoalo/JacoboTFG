@@ -1,0 +1,292 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-outline-secondary me-3" (click)="volverALista()">
+        <i class="fa fa-arrow-left"></i>
+      </button>
+      <h2 class="mb-0">Gastos del Proyecto</h2>
+    </div>
+    <div>
+      <button class="btn btn-secondary" [routerLink]="['/dashboard']">
+        <i class="fa fa-home me-1"></i> Menú Principal
+      </button>
+    </div>
+  </div>
+
+  <!-- Panel de filtros -->
+  <div *ngIf="mostrarFiltros" class="card mb-4" [@fadeInOut]>
+    <div class="card-header bg-light">
+      <h5 class="mb-0">Filtros</h5>
+    </div>
+    <div class="card-body">
+      <form (ngSubmit)="aplicarFiltros()" #filtroForm="ngForm">
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <label for="tipoGasto" class="form-label">Tipo de Gasto</label>
+            <select class="form-select" id="tipoGasto" name="tipoGasto" [(ngModel)]="filtros.tipo">
+              <option value="">Todos</option>
+              <option value="personal">Personal</option>
+              <option value="material">Material</option>
+              <option value="viaje">Viajes</option>
+              <option value="contrato">Contratos</option>
+              <option value="otros">Otros</option>
+            </select>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="fechaDesde" class="form-label">Fecha Desde</label>
+            <input type="date" class="form-control" id="fechaDesde" name="fechaDesde" [(ngModel)]="filtros.fechaDesde">
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="fechaHasta" class="form-label">Fecha Hasta</label>
+            <input type="date" class="form-control" id="fechaHasta" name="fechaHasta" [(ngModel)]="filtros.fechaHasta">
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="estado" class="form-label">Estado</label>
+            <select class="form-select" id="estado" name="estado" [(ngModel)]="filtros.estado">
+              <option value="">Todos</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="aprobado">Aprobado</option>
+              <option value="rechazado">Rechazado</option>
+              <option value="justificado">Justificado</option>
+            </select>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-secondary" (click)="reiniciarFiltros()">
+            Reiniciar
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Aplicar Filtros
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Información del proyecto -->
+  <div class="card mb-3">
+    <div class="card-header bg-light text-dark py-2">
+      <h6 class="mb-0">Información del Proyecto</h6>
+    </div>
+    <div class="card-body py-2">
+      <div *ngIf="loading" class="text-center py-2">
+        <div class="spinner-border spinner-border-sm text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <span class="ms-2 small">Cargando información del proyecto...</span>
+      </div>
+      <div *ngIf="!loading && proyecto" class="row">
+        <div class="col-md-4">
+          <small class="text-muted">ID Proyecto:</small>
+          <p class="mb-0 small">{{ proyecto.IDProyecto }}</p>
+        </div>
+        <div class="col-md-4">
+          <small class="text-muted">Investigador Principal:</small>
+          <p class="mb-0 small">{{ getNombreInvestigador(proyecto.ip) }}</p>
+        </div>
+        <div class="col-md-4">
+          <small class="text-muted">Importe Total:</small>
+          <p class="mb-0 small">{{ proyecto.cantidad_total | currency:'EUR' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resumen económico -->
+  <div class="row mb-3">
+    <div class="col-md-3">
+      <div class="card h-100">
+        <div class="card-body py-2">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <small class="text-muted">Presupuesto Total</small>
+            <i class="fa fa-euro-sign text-primary"></i>
+          </div>
+          <h5 class="mb-0">{{proyecto?.cantidad_total | currency:'EUR'}}</h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card h-100">
+        <div class="card-body py-2">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <small class="text-muted">Total Gastado</small>
+            <i class="fa fa-shopping-cart text-success"></i>
+          </div>
+          <h5 class="mb-0">{{totalGastado | currency:'EUR'}}</h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card h-100">
+        <div class="card-body py-2">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <small class="text-muted">Disponible</small>
+            <i class="fa fa-wallet text-info"></i>
+          </div>
+          <h5 class="mb-0">{{totalDisponible | currency:'EUR'}}</h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card h-100">
+        <div class="card-body py-2">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <small class="text-muted">% Ejecutado</small>
+            <i class="fa fa-chart-line" [ngClass]="{'text-warning': porcentajeEjecutado < 50, 'text-danger': porcentajeEjecutado >= 50}"></i>
+          </div>
+          <h5 class="mb-0">{{porcentajeEjecutado}}%</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Desglose de gastos -->
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header bg-light text-dark py-2">
+          <h6 class="mb-0">Contratos Menores</h6>
+        </div>
+        <div class="card-body py-2">
+          <h5 class="text-primary mb-1">{{totalContratos | currency:'EUR'}}</h5>
+          <small class="text-muted">{{contratos.length}} contratos</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header bg-light text-dark py-2">
+          <h6 class="mb-0">Comisiones de Servicio</h6>
+        </div>
+        <div class="card-body py-2">
+          <h5 class="text-success mb-1">{{totalComisiones | currency:'EUR'}}</h5>
+          <small class="text-muted">{{comisiones.length}} comisiones</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header bg-light text-dark py-2">
+          <h6 class="mb-0">Gastos de Personal</h6>
+        </div>
+        <div class="card-body py-2">
+          <h5 class="text-info mb-1">{{totalGastosPersonal | currency:'EUR'}}</h5>
+          <small class="text-muted">{{gastosPersonal.length}} gastos</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <div *ngIf="loading" class="text-center p-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2">Cargando gastos del proyecto...</p>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+    <button type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="cargarGastos()">
+      <i class="fa fa-refresh"></i> Reintentar
+    </button>
+  </div>
+
+  <!-- Listado de Gastos -->
+  <div *ngIf="!loading && !error" class="card shadow-sm">
+    <div class="card-header bg-white border-0 py-2">
+      <div class="d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">Gastos del Proyecto</h6>
+      </div>
+    </div>
+
+    <div class="card-body p-0">
+      <!-- Contratos Menores -->
+      <div *ngIf="contratos.length > 0" class="border-bottom">
+        <div class="bg-light text-dark px-3 py-2">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Contratos Menores</h6>
+            <span class="badge bg-primary text-white">{{contratos.length}} contratos</span>
+          </div>
+        </div>
+        <div class="list-group list-group-flush">
+          <div *ngFor="let contrato of contratos" class="list-group-item px-2 py-1">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="text-truncate me-2" style="max-width: 60%;">
+                <small class="fw-bold d-block text-truncate">ID: {{contrato.id}} - {{contrato.concepto}}</small>
+                <small class="text-muted d-block text-truncate">{{contrato.proveedor}} • {{contrato.fecha_firma_ip | date:'dd/MM/yyyy'}}</small>
+              </div>
+              <div class="d-flex align-items-center">
+                <small class="me-2">{{contrato.importe | currency:'EUR'}}</small>
+                <span class="badge bg-light text-dark me-2">{{contrato.estado}}</span>
+                <button class="btn btn-link text-primary p-0" [routerLink]="['/contratos-menores', contrato.id]">
+                  <i class="fa fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comisiones de Servicio -->
+      <div *ngIf="comisiones.length > 0" class="border-bottom">
+        <div class="bg-light text-dark px-3 py-2">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Comisiones de Servicio</h6>
+            <span class="badge bg-success text-white">{{comisiones.length}} comisiones</span>
+          </div>
+        </div>
+        <div class="list-group list-group-flush">
+          <div *ngFor="let comision of comisiones" class="list-group-item px-2 py-1">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="text-truncate me-2" style="max-width: 60%;">
+                <small class="fw-bold d-block text-truncate">ID: {{comision.id_comision}} - {{comision.motivo_viaje}}</small>
+                <small class="text-muted d-block text-truncate">{{comision.nombre}} {{comision.apellido1}} • {{comision.fecha_inicio | date:'dd/MM/yyyy'}}</small>
+              </div>
+              <div class="d-flex align-items-center">
+                <small class="me-2">{{comision.gastos_generados | currency:'EUR'}}</small>
+                <span class="badge bg-light text-dark me-2">{{comision.estado}}</span>
+                <button class="btn btn-link text-primary p-0" [routerLink]="['/comisiones-servicio', comision.id_comision]">
+                  <i class="fa fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gastos de Personal -->
+      <div *ngIf="gastosPersonal.length > 0">
+        <div class="bg-light text-dark px-3 py-2">
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Gastos de Personal</h6>
+            <span class="badge bg-info text-white">{{gastosPersonal.length}} gastos</span>
+          </div>
+        </div>
+        <div class="list-group list-group-flush">
+          <div *ngFor="let gasto of gastosPersonal" class="list-group-item px-2 py-1">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="text-truncate me-2" style="max-width: 60%;">
+                <small class="fw-bold d-block text-truncate">{{getNombreInvestigador(gasto.dni)}} ({{gasto.dni}})</small>
+                <small class="text-muted d-block text-truncate">{{gasto.tipo_gasto}} • {{gasto.mes}}/{{gasto.anio}}</small>
+              </div>
+              <div class="d-flex align-items-center">
+                <small class="me-2">{{gasto.importe | currency:'EUR'}}</small>
+                <span class="badge bg-light text-dark me-2">{{gasto.documento ? 'Justificado' : 'Pendiente'}}</span>
+                <button class="btn btn-link text-primary p-0" [routerLink]="['/gastos-personal', gasto.dni, gasto.proyecto, gasto.mes, gasto.anio]">
+                  <i class="fa fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensaje cuando no hay gastos -->
+      <div *ngIf="contratos.length === 0 && comisiones.length === 0 && gastosPersonal.length === 0" class="text-center py-3">
+        <i class="fa fa-info-circle text-muted mb-2"></i>
+        <p class="text-muted mb-0 small">No hay gastos registrados para este proyecto</p>
+      </div>
+    </div>
+  </div>
+</div>

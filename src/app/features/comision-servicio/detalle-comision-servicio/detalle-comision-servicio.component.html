@@ -1,0 +1,336 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-outline-secondary me-3" (click)="volverALista()">
+        <i class="fa fa-arrow-left"></i>
+      </button>
+      <h2 class="mb-0">Detalle de Comisión de Servicio</h2>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-secondary" [routerLink]="['/dashboard']">
+        <i class="fa fa-home me-1"></i> Menú Principal
+      </button>
+      <div *ngIf="!loading && comision">
+        <button type="button" class="btn btn-secondary me-2" (click)="generarPDF()" [disabled]="generandoPDF">
+          <i class="fa fa-file-pdf-o me-1"></i> Generar PDF
+          <span *ngIf="generandoPDF" class="spinner-border spinner-border-sm ms-1" role="status" aria-hidden="true"></span>
+        </button>
+        <button *ngIf="isGestor" type="button" class="btn btn-primary" (click)="editarComision()">
+          <i class="fa fa-edit me-1"></i> Editar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center p-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2">Cargando información de la comisión...</p>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+    <button *ngIf="comisionId" type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="cargarComision()">
+      <i class="fa fa-refresh"></i> Reintentar
+    </button>
+  </div>
+
+  <div *ngIf="!loading && !error && comision" class="row">
+    <div class="col-md-12 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Información General</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <strong>ID Comisión:</strong>
+              <p class="mb-0">{{ comision.id_comision }}</p>
+            </div>
+            <div class="col-md-4 mb-3">
+              <strong>Proyecto:</strong>
+              <p class="mb-0">{{ comision.proyecto }}</p>
+            </div>
+            <div class="col-md-4 mb-3">
+              <strong>Comisionado:</strong>
+              <p class="mb-0">{{ comision.nombre }} {{ comision.apellido1 }} {{ comision.apellido2 || '' }}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <strong>NIF/NIE:</strong>
+              <p class="mb-0">{{ comision.nif_comisionado }}</p>
+            </div>
+            <div class="col-md-4 mb-3">
+              <strong>Cargo:</strong>
+              <p class="mb-0">{{ comision.cargo }}</p>
+            </div>
+            <div class="col-md-4 mb-3">
+              <strong>Grupo:</strong>
+              <p class="mb-0">{{ comision.grupo }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-12 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Datos del Viaje</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <strong>Motivo del viaje:</strong>
+              <p class="mb-0">{{ comision.motivo_viaje }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <strong>Destino:</strong>
+              <p class="mb-0">{{ comision.destino }}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <strong>Fecha inicio:</strong>
+              <p class="mb-0">{{ comision.fecha_inicio | date:'dd/MM/yyyy' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Hora inicio:</strong>
+              <p class="mb-0">{{ comision.hinicio | date:'HH:mm' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Fecha fin:</strong>
+              <p class="mb-0">{{ comision.fecha_fin | date:'dd/MM/yyyy' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Hora fin:</strong>
+              <p class="mb-0">{{ comision.hfin | date:'HH:mm' }}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <strong>Origen:</strong>
+              <p class="mb-0">{{ comision.origen }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <strong>Gastos estimados:</strong>
+              <p class="mb-0">{{ comision.gastos_generados | currency:'EUR' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-12 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Derechos y Gastos</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <strong>Derecho a dietas:</strong>
+              <p class="mb-0">{{ comision.derecho_dietas ? 'Sí' : 'No' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Gastos de viaje:</strong>
+              <p class="mb-0">{{ comision.gastos_viajes ? 'Sí' : 'No' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Residencia:</strong>
+              <p class="mb-0">{{ comision.residencia ? 'Sí' : 'No' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Gastos realizados:</strong>
+              <p class="mb-0">{{ comision.gastos_realizados ? 'Sí' : 'No' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-12 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Transporte</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <strong>Transporte aéreo:</strong>
+              <p class="mb-0">{{ comision.transporte_aereo ? 'Sí' : 'No' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Vehículo particular:</strong>
+              <p class="mb-0">{{ comision.vehiculo_particular ? 'Sí' : 'No' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Vehículo oficial:</strong>
+              <p class="mb-0">{{ comision.vehiculo_oficial ? 'Sí' : 'No' }}</p>
+            </div>
+            <div class="col-md-3 mb-3" *ngIf="comision.vehiculo_oficial || comision.vehiculo_particular">
+              <strong>Matrícula:</strong>
+              <p class="mb-0">{{ comision.matricula || 'No especificada' }}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <strong>Gastos garaje:</strong>
+              <p class="mb-0">{{ comision.gastos_garaje ? 'Sí' : 'No' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Gastos peaje:</strong>
+              <p class="mb-0">{{ comision.gastos_peaje ? 'Sí' : 'No' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Transporte vehículo/barco:</strong>
+              <p class="mb-0">{{ comision.transporte_vehiculo_barco ? 'Sí' : 'No' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Consigna equipaje:</strong>
+              <p class="mb-0">{{ comision.consigna_equipaje ? 'Sí' : 'No' }}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <strong>Tren alta velocidad:</strong>
+              <p class="mb-0">{{ comision.tren_alta_velocidad ? 'Sí' : 'No' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Tren nocturno:</strong>
+              <p class="mb-0">{{ comision.tren_nocturno ? 'Sí' : 'No' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Tren convencional:</strong>
+              <p class="mb-0">{{ comision.tren_convencional ? 'Sí' : 'No' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Transporte marítimo:</strong>
+              <p class="mb-0">{{ comision.transporte_maritimo ? 'Sí' : 'No' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-12 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Otros Gastos</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <strong>Llamada teléfono oficial:</strong>
+              <p class="mb-0">{{ comision.llamada_tfno_oficial ? 'Sí' : 'No' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Gastos lavandería:</strong>
+              <p class="mb-0">{{ comision.gastos_lavanderia ? 'Sí' : 'No' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Taxi residencia:</strong>
+              <p class="mb-0">{{ comision.gastos_taxi_residencia ? 'Sí' : 'No' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Taxi servicio:</strong>
+              <p class="mb-0">{{ comision.gastos_taxi_servicio ? 'Sí' : 'No' }}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <strong>Gastos cena:</strong>
+              <p class="mb-0">{{ comision.gastos_cena ? 'Sí' : 'No' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Gastos reembolsables UE:</strong>
+              <p class="mb-0">{{ comision.gastos_reembolsables_ue ? 'Sí' : 'No' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-12 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Autorización y Documentación</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <strong>Autorizador:</strong>
+              <p class="mb-0">{{ comision.autorizador || 'No especificado' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Cargo autorizador:</strong>
+              <p class="mb-0">{{ comision.a_cargo || 'No especificado' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Localidad autorización:</strong>
+              <p class="mb-0">{{ comision.a_localidad || 'No especificada' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Fecha firma:</strong>
+              <p class="mb-0">{{ comision.a_fecha_firma ? (comision.a_fecha_firma | date:'dd/MM/yyyy') : 'No especificada' }}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <strong>Documento generado:</strong>
+              <p class="mb-0">{{ comision.d_generado ? 'Sí' : 'No' }}</p>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Documento firmado:</strong>
+              <div *ngIf="comision.documento_firmado" class="mt-2">
+                <a href="javascript:void(0)" (click)="abrirDocumento(comision.documento_firmado)" class="btn btn-sm btn-outline-primary">
+                  <i class="fa fa-download me-1"></i> Descargar
+                </a>
+              </div>
+              <div *ngIf="!comision.documento_firmado" class="text-muted mt-2">
+                No hay documento disponible
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Documentación gastos:</strong>
+              <div *ngIf="comision.documentacion_gastos" class="mt-2">
+                <a href="javascript:void(0)" (click)="abrirDocumento(comision.documentacion_gastos)" class="btn btn-sm btn-outline-primary">
+                  <i class="fa fa-download me-1"></i> Descargar
+                </a>
+              </div>
+              <div *ngIf="!comision.documentacion_gastos" class="text-muted mt-2">
+                No hay documento disponible
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <strong>Documento JP:</strong>
+              <div *ngIf="comision.documento_jp" class="mt-2">
+                <a href="javascript:void(0)" (click)="abrirDocumento(comision.documento_jp)" class="btn btn-sm btn-outline-primary">
+                  <i class="fa fa-download me-1"></i> Descargar
+                </a>
+              </div>
+              <div *ngIf="!comision.documento_jp" class="text-muted mt-2">
+                No hay documento disponible
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <strong>Fecha abono:</strong>
+              <p class="mb-0">{{ comision.fecha_abono ? (comision.fecha_abono | date:'dd/MM/yyyy') : 'No especificada' }}</p>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-12 d-flex justify-content-end">
+              <button *ngIf="isGestor" class="btn btn-primary" [routerLink]="['/comisiones-servicio', comision.id_comision, 'editar']">
+                <i class="fa fa-edit me-1"></i> Editar Comisión
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
