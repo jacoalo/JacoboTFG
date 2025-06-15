@@ -23,7 +23,11 @@ export class LoginComponent {
   ) {}
 
   login(): void {
-    if (!this.username || !this.password) {
+    // Limpiar espacios en blanco
+    const trimmedUsername = this.username?.trim();
+    const trimmedPassword = this.password?.trim();
+    
+    if (!trimmedUsername || !trimmedPassword) {
       this.errorMessage = 'Por favor, introduce usuario y contraseña';
       return;
     }
@@ -31,7 +35,7 @@ export class LoginComponent {
     this.loading = true;
     this.errorMessage = '';
 
-    this.authService.login(this.username, this.password)
+    this.authService.login(trimmedUsername, trimmedPassword)
       .subscribe({
         next: () => {
           this.router.navigate(['/dashboard']);

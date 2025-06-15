@@ -19,7 +19,7 @@ export class DashboardComponent implements OnInit {
   error: string = '';
   mensajeExito: string = '';
   investigadores: {[dni: string]: Usuario} = {};
-  private readonly API_URL = 'http://localhost:3000'; // URL del backend
+  private readonly API_URL = 'http://localhost:3000'; // URL de la API
 
   constructor(
     private authService: AuthService,
@@ -30,7 +30,7 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Limpiar la pila de navegación al entrar al dashboard
+    // Limpiar historial de navegación
     this.navigationService.clearStack();
     this.navigationService.pushState('/dashboard', 'Dashboard');
     
@@ -42,7 +42,7 @@ export class DashboardComponent implements OnInit {
     this.http.get<Usuario[]>(`${this.API_URL}/Usuario?investigador=eq.true`)
       .subscribe({
         next: (usuarios) => {
-          // Crear un mapa de DNI a objeto Usuario para fácil acceso
+          // Crear índice de usuarios por DNI
           usuarios.forEach(user => {
             this.investigadores[user.dni] = user;
           });
@@ -52,7 +52,7 @@ export class DashboardComponent implements OnInit {
           console.error('Error cargando investigadores', error);
           this.error = 'Error al cargar los investigadores.';
           this.loading = false;
-          // Intentamos cargar los proyectos de todos modos
+          // Cargar proyectos aunque falle la carga de investigadores
           this.loadProyectos();
         }
       });
@@ -86,7 +86,7 @@ export class DashboardComponent implements OnInit {
         .subscribe({
           next: () => {
             this.mensajeExito = `Proyecto ${proyecto.IDProyecto} eliminado correctamente`;
-            this.loadProyectos(); // Recargar la lista después de eliminar
+            this.loadProyectos(); // Actualizar la lista
           },
           error: (error) => {
             console.error('Error eliminando proyecto', error);
@@ -102,7 +102,7 @@ export class DashboardComponent implements OnInit {
       const inv = this.investigadores[dni];
       return `${inv.nombre} ${inv.apellido1} ${inv.apellido2 || ''}`.trim();
     }
-    return dni; // Si no encontramos el investigador, mostramos el DNI
+    return dni; // Mostrar DNI si no se encuentra el investigador
   }
 
   isGestor(): boolean {

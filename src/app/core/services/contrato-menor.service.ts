@@ -216,7 +216,7 @@ export class ContratoMenorService {
                         // Añadimos logo o título
                         pdf.setFontSize(22);
                         pdf.setTextColor(0, 51, 153); // Azul corporativo
-                        pdf.text('Gestión Justificaciones', 105, 20, { align: 'center' });
+                        pdf.text('Gestión CSIC', 105, 20, { align: 'center' });
                         
                         // Título del documento
                         pdf.setFontSize(18);

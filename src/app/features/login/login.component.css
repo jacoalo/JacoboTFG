@@ -34,7 +34,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Para evitar que el spinner desaparezca */
+/* Mantener el spinner visible */
 .spinner-border {
   display: inline-block;
 } 

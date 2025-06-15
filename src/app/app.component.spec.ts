@@ -8,22 +8,23 @@ describe('AppComponent', () => {
     }).compileComponents();
   });
 
-  it('should create the app', () => {
+  it('debería crear la app', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'gestionCSIC' title`, () => {
+  it(`debería tener el título 'Gestión Justificaciones'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('gestionCSIC');
+    expect(app.title).toEqual('Gestión Justificaciones');
   });
 
-  it('should render title', () => {
+  it('debería renderizar título', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, gestionCSIC');
+    // El AppComponent solo tiene router-outlet, no renderiza el título directamente
+    expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
 });

@@ -8,7 +8,7 @@ import { Usuario } from '../models';
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'http://localhost:3000'; // URL del backend
+  private readonly API_URL = 'http://localhost:3000'; // URL de la API del backend
   private currentUserSubject = new BehaviorSubject<Usuario | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
   
@@ -22,18 +22,24 @@ export class AuthService {
   private loadStoredUser(): void {
     const storedUser = localStorage.getItem(this.userKey);
     if (storedUser) {
-      this.currentUserSubject.next(JSON.parse(storedUser));
+      try {
+        this.currentUserSubject.next(JSON.parse(storedUser));
+      } catch (error) {
+        // Limpiar datos corruptos del localStorage
+        localStorage.removeItem(this.userKey);
+        localStorage.removeItem(this.tokenKey);
+      }
     }
   }
 
   login(login: string, password: string): Observable<Usuario> {
-    // Consultar el usuario en la tabla Usuario filtrando por login y password
+    // Buscar usuario en la base de datos con las credenciales proporcionadas
     return this.http.get<Usuario[]>(`${this.API_URL}/Usuario?login=eq.${login}&password=eq.${password}`)
       .pipe(
         map(users => {
           if (users && users.length > 0) {
             const user = users[0];
-            // Generamos un token simple para la sesión
+            // Generar un token simple para la sesión del usuario
             const token = `token-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
             
             localStorage.setItem(this.tokenKey, token);
@@ -111,7 +117,7 @@ export class AuthService {
           return throwError(() => new Error('Error al cambiar la contraseña. Verifica que la contraseña actual sea correcta.'));
         })
       ).pipe(
-        // Flatten the observable-of-observable
+        // Aplanar el observable-de-observable
         mergeMap(obs => obs)
       );
   }
