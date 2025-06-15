@@ -58,6 +58,39 @@ ng serve
 
 3. Abre tu navegador en `http://localhost:4200`
 
+## Tests
+
+El proyecto incluye tests unitarios para los componentes, servicios y guards de Angular implementados con Jasmine y Karma.
+
+### Ejecutar todos los tests
+```bash
+ng test
+```
+
+### Ejecutar tests en modo watch (se ejecutan automáticamente al cambiar archivos)
+```bash
+ng test --watch
+```
+
+### Ejecutar tests con cobertura de código
+```bash
+ng test --code-coverage
+```
+
+### Ejecutar tests en modo headless (sin abrir navegador)
+```bash
+ng test --watch=false --browsers=ChromeHeadless
+```
+
+### Cobertura de tests
+
+- **Servicios principales**: AuthService, ProyectoService con tests exhaustivos de funcionalidad
+- **Guards**: Tests de autorización y redirección (authGuard, gestorGuard)  
+- **Componentes**: Tests de creación y funcionalidad básica de todos los componentes
+- **Casos cubiertos**: Autenticación, autorización por roles, CRUD de proyectos, validaciones de formularios, manejo de errores
+
+Los tests están completamente en español siguiendo las mejores prácticas de testing con patrones AAA (Preparar-Ejecutar-Verificar).
+
 ## Características principales
 
 - **Autenticación**: Login de usuarios, cambio de contraseña y gestión de perfiles
