@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: gestionCSIC
+      POSTGRES_PASSWORD: "1ywHICQg2DjGJO"
+      POSTGRES_DB: gestionCSIC
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"    # Mapeo del puerto para conexiones externas (DBeaver)
+    networks:
+      - postgrest_network
+
+  postgrest:
+    image: postgrest/postgrest:latest
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+    environment:
+      # Cadena de conexión a PostgreSQL
+      PGRST_DB_URI: "postgres://gestionCSIC:1ywHICQg2DjGJO@db:5432/gestionCSIC"
+      # Esquema de la base de datos
+      PGRST_DB_SCHEMA: "public"
+      # Rol anónimo: usar gestionCSIC para evitar errores de role inexistente
+      PGRST_DB_ANON_ROLE: "gestionCSIC"
+      # Tamaño del pool de conexiones
+      PGRST_DB_POOL: "10"
+    networks:
+      - postgrest_network
+
+  bibliotecario:
+    build: ./bibliotecario
+    restart: always
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./documentos_data:/app/documentos
+    networks:
+      - postgrest_network
+
+networks:
+  postgrest_network:
+    driver: bridge
