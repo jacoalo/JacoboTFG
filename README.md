@@ -1,4 +1,4 @@
-# Gestión Justificaciones
+# Gestión Justificaciones 
 
 Aplicación web para la gestión de proyectos y justificaciones desarrollada con Angular 19 y PostgreSQL.
 
