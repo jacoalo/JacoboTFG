@@ -18,45 +18,48 @@ Esta aplicación permite la gestión completa de proyectos de subvención I+D ad
 - Node.js 18.x o superior
 - Angular CLI 19.x
 - PostgreSQL 14.x o superior
+- Docker Desktop
 
 ## Instalación
 
-1. Clona este repositorio
+1. Créate una carpeta donde guardar el proyecto y Clona este repositorio
 ```bash
 git clone <url-del-repositorio>
-cd gestionCSIC
 ```
 
 2. Instala las dependencias
 ```bash
 npm install
+wsl --install
 ```
 
 3. Configura la base de datos
    - Asegúrate de tener PostgreSQL instalado y en ejecución
-   - Crea una base de datos para la aplicación
-   - Ejecuta el script de creación de tablas ubicado en `backend/db/schema.sql`
+   - Ejecuta Docker Desktop (debes tenerlo instalado)
 
-4. Configura el backend
-```bash
-cd backend
-npm install
-```
+
 
 ## Ejecución
 
 1. Inicia el backend
 ```bash
 cd backend
-npm run start
+docker-compose up -d
 ```
 
-2. Inicia la aplicación Angular (en otra terminal)
+2. Inicia la aplicación Angular (en la ruta raiz del proyecto y en otra terminal)
 ```bash
-ng serve
+ng serve --open
 ```
 
 3. Abre tu navegador en `http://localhost:4200`
+
+
+4. Detener el backend
+```bash
+cd backend
+docker-compose down
+```
 
 ## Tests
 
@@ -109,4 +112,4 @@ Los tests están completamente en español siguiendo las mejores prácticas de t
 
 ## Licencia
 
-Este proyecto está licenciado bajo la Licencia MIT - ver el archivo LICENSE para más detalles.
+Este proyecto está creado para la entrega del Trabajo Fin de Grado en la Universidad Internacional de La Rioja
