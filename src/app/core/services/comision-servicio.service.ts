@@ -130,11 +130,11 @@ export class ComisionServicioService {
                   // Título y cabecera
                   pdf.setFontSize(22);
                   pdf.setTextColor(0, 51, 153); // Azul corporativo
-                  pdf.text('Gestión CSIC', 105, 20, { align: 'center' });
+                  pdf.text('Gestión IBGM CSIC', 105, 20, { align: 'center' });
                   
                   pdf.setFontSize(18);
                   pdf.setTextColor(0, 0, 0);
-                  pdf.text(`Comisión de Servicio: ${comision.id_comision}`, 105, 35, { align: 'center' });
+                  pdf.text(`Orden Comisión de Servicio: ${comision.id_comision}`, 105, 35, { align: 'center' });
                   
                   pdf.setFontSize(10);
                   pdf.setTextColor(100, 100, 100);
@@ -170,7 +170,7 @@ export class ComisionServicioService {
                   // Datos del viaje
                   pdf.setFontSize(14);
                   pdf.setTextColor(0, 102, 204);
-                  pdf.text('Datos del Viaje', 20, 130);
+                  pdf.text('Datos de la Comisión', 20, 130);
                   
                   pdf.setFontSize(11);
                   pdf.setTextColor(0, 0, 0);
@@ -257,31 +257,7 @@ export class ComisionServicioService {
                   const fechaFirma = comision.a_fecha_firma ? new Date(comision.a_fecha_firma).toLocaleDateString() : 'No especificada';
                   pdf.text(`Fecha de firma: ${fechaFirma}`, 25, yPos += 7);
                   
-                  // Información económica
-                  yPos += 10;
-                  pdf.setFontSize(14);
-                  pdf.setTextColor(0, 102, 204);
-                  pdf.text('Información Económica', 20, yPos);
-                  
-                  pdf.setFontSize(11);
-                  pdf.setTextColor(0, 0, 0);
-                  pdf.text(`Gastos generados: ${comision.gastos_generados || 0} €`, 25, yPos += 10);
-                  
-                  const fechaAbono = comision.fecha_abono ? new Date(comision.fecha_abono).toLocaleDateString() : 'No especificada';
-                  pdf.text(`Fecha de abono: ${fechaAbono}`, 25, yPos += 7);
-                  
-                  // Documentación
-                  yPos += 10;
-                  pdf.setFontSize(14);
-                  pdf.setTextColor(0, 102, 204);
-                  pdf.text('Documentación', 20, yPos);
-                  
-                  pdf.setFontSize(11);
-                  pdf.setTextColor(0, 0, 0);
-                  pdf.text(`Documento generado: ${comision.d_generado ? 'Sí' : 'No'}`, 25, yPos += 10);
-                  pdf.text(`Documento firmado: ${comision.documento_firmado ? 'Disponible' : 'No disponible'}`, 25, yPos += 7);
-                  pdf.text(`Documentación gastos: ${comision.documentacion_gastos ? 'Disponible' : 'No disponible'}`, 25, yPos += 7);
-                  pdf.text(`Documento JP: ${comision.documento_jp ? 'Disponible' : 'No disponible'}`, 25, yPos += 7);
+                 
                   
                   // Convertir el PDF a Blob y retornarlo
                   const pdfBlob = pdf.output('blob');

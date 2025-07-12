@@ -216,7 +216,7 @@ export class ContratoMenorService {
                         // Añadimos logo o título
                         pdf.setFontSize(22);
                         pdf.setTextColor(0, 51, 153); // Azul corporativo
-                        pdf.text('Gestión CSIC', 105, 20, { align: 'center' });
+                        pdf.text('Gestión IBGM CSIC', 105, 20, { align: 'center' });
                         
                         // Título del documento
                         pdf.setFontSize(18);
@@ -235,7 +235,7 @@ export class ContratoMenorService {
                         // Datos del proyecto
                         pdf.setFontSize(14);
                         pdf.setTextColor(0, 102, 204);
-                        pdf.text('Datos del Proyecto', 20, 60);
+                        pdf.text('Propuesta de contratación', 20, 60);
                         
                         pdf.setFontSize(11);
                         pdf.setTextColor(0, 0, 0);
@@ -246,7 +246,7 @@ export class ContratoMenorService {
                         const nombreCompleto = investigador ? 
                           `${investigador.nombre || ''} ${investigador.apellido1 || ''} ${investigador.apellido2 || ''}`.trim() : 
                           'No disponible';
-                        pdf.text(`Investigador Principal: ${nombreCompleto}`, 25, 84);
+                        pdf.text(`Unidad Proponente Investigador Principal: ${nombreCompleto}`, 25, 84);
                         
                         // Datos del contrato
                         pdf.setFontSize(14);
@@ -296,7 +296,7 @@ export class ContratoMenorService {
                         yPos += 10;
                         pdf.setFontSize(14);
                         pdf.setTextColor(0, 102, 204);
-                        pdf.text('Datos de Firma', 20, yPos);
+                        pdf.text('Aprobación del Gasto', 20, yPos);
                         
                         pdf.setFontSize(11);
                         pdf.setTextColor(0, 0, 0);
@@ -309,7 +309,7 @@ export class ContratoMenorService {
                           
                           pdf.setFontSize(14);
                           pdf.setTextColor(0, 102, 204);
-                          pdf.text('Artículos', 20, 20);
+                          pdf.text('Objeto de contratación', 20, 20);
                           
                           // Tabla de artículos con columnas redistribuidas
                           pdf.setFontSize(8);
@@ -383,7 +383,7 @@ export class ContratoMenorService {
                         // Pie de página en la última página
                         pdf.setFontSize(8);
                         pdf.setTextColor(150, 150, 150);
-                        pdf.text('© CSIC - Gestión de Contratos Menores - Documento generado automáticamente', 105, 280, { align: 'center' });
+                        pdf.text('© IBGM CSIC - Gestión de Contratos Menores - Documento generado automáticamente', 105, 280, { align: 'center' });
                         
                         // Convertimos el PDF a blob y lo enviamos
                         const pdfBlob = pdf.output('blob');
